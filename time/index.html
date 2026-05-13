@@ -94,6 +94,15 @@
         radial-gradient(ellipse 560px 320px at 52% 38%, rgba(8,8,8,0.93) 0%, rgba(8,8,8,0.4) 60%, transparent 100%),
         linear-gradient(to right, rgba(8,8,8,0.05) 0%, rgba(8,8,8,0.5) 55%, rgba(8,8,8,0.88) 100%);
     }
+    @media (max-width: 768px) {
+      .hero::before { background-position: center top; opacity: 0.35; }
+      .hero::after {
+        background:
+          linear-gradient(to bottom, rgba(8,8,8,0.3) 0%, rgba(8,8,8,0.75) 100%);
+      }
+      .hero-stats { gap: 20px; margin-top: 40px; }
+      .hero-stat .num { font-size: 1.8rem; }
+    }
     .hero-content { position: relative; z-index: 2; max-width: 700px; }
     .hero-badge {
       display: inline-block;
@@ -310,8 +319,14 @@
     .results-intro { color: #bbb; margin-bottom: 40px; max-width: 560px; }
     .results-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
+    }
+    @media (max-width: 600px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 601px) and (max-width: 900px) {
+      .results-grid { grid-template-columns: repeat(2, 1fr); }
     }
     .result-card {
       border-radius: 12px;
@@ -554,7 +569,7 @@
     <p class="section-tag">Prova real</p>
     <h2>Veja o que é possível em poucos meses</h2>
     <p class="results-intro">Antes de explicar o método, quero que você veja com seus próprios olhos. Sem filtro, sem photoshop.</p>
-    <div class="results-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="results-grid">
       <div class="result-card">
         <img src="https://fabriciomoura.com/wp-content/uploads/2024/10/1-1.png" alt="Transformação 1" loading="lazy" />
       </div>
@@ -576,13 +591,13 @@
     <div class="method-grid">
       <div class="method-step">
         <span class="step-num">1</span>
-        <div class="step-icon">🔍</div>
+        <div class="step-icon"><i class="fa-solid fa-magnifying-glass" style="font-size:2rem;color:var(--yellow);"></i></div>
         <h3>Diagnóstico</h3>
         <p>Análise completa do seu histórico, exames, biotipo e objetivos reais.</p>
       </div>
       <div class="method-step">
         <span class="step-num">2</span>
-        <div class="step-icon">📋</div>
+        <div class="step-icon"><i class="fa-solid fa-clipboard-list" style="font-size:2rem;color:var(--yellow);"></i></div>
         <h3>Protocolo</h3>
         <p>Dieta e treino 100% personalizados para a sua rotina, sem radicalismos.</p>
       </div>
@@ -596,7 +611,7 @@
       </div>
       <div class="method-step">
         <span class="step-num">4</span>
-        <div class="step-icon">🏆</div>
+        <div class="step-icon"><i class="fa-solid fa-trophy" style="font-size:2rem;color:var(--yellow);"></i></div>
         <h3>Garantia</h3>
         <p>Resultados comprovados ou seu investimento totalmente de volta.</p>
       </div>
@@ -657,7 +672,7 @@
     <p class="section-tag">Mais histórias do Time</p>
     <h2>Eles já estão do outro lado. Você é o próximo.</h2>
     <p class="results-intro">Mais de 2000 transformações em 7 países. Cada uma com um protocolo único, feito sob medida.</p>
-    <div class="results-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="results-grid">
       <div class="result-card">
         <img src="https://fabriciomoura.com/wp-content/uploads/2024/10/4-1.png" alt="Transformação 4" loading="lazy" />
       </div>
