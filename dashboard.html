@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Fabricio Moura</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --yellow: #F5C518;
+    --yellow-dim: #c9a010;
+    --yellow-bg: rgba(245,197,24,0.08);
+    --yellow-border: rgba(245,197,24,0.25);
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --surface3: #222222;
+    --text: #f0f0f0;
+    --text-dim: #888888;
+    --text-muted: #555555;
+    --green: #22c55e;
+    --red: #ef4444;
+    --orange: #f97316;
+    --blue: #3b82f6;
+    --border: #2a2a2a;
+    --radius: 10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:14px; line-height:1.5; min-height:100vh; }
+
+  /* HEADER */
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+  .header-left { display:flex; align-items:center; gap:12px; }
+  .logo-mark { width:34px; height:34px; background:var(--yellow); border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; color:#000; flex-shrink:0; }
+  .header-title { font-size:15px; font-weight:700; }
+  .header-sub { font-size:11px; color:var(--text-dim); }
+  .header-date { font-size:11px; color:var(--text-dim); background:var(--surface2); padding:5px 10px; border-radius:20px; border:1px solid var(--border); white-space:nowrap; }
+  .header-date span { color:var(--yellow); font-weight:600; }
+
+  /* TABS */
+  .tabs { display:flex; gap:4px; padding:16px 24px 0; border-bottom:1px solid var(--border); background:var(--surface); overflow-x:auto; }
+  .tab { padding:8px 16px; font-size:12px; font-weight:700; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:all 0.15s; border-radius:4px 4px 0 0; user-select:none; }
+  .tab:hover { color:var(--text-dim); }
+  .tab.active { color:var(--yellow); border-bottom-color:var(--yellow); }
+
+  /* SECTIONS */
+  .section { display:none; padding:20px 24px; max-width:1400px; margin:0 auto; }
+  .section.active { display:block; }
+
+  /* GRID */
+  .grid { display:grid; gap:16px; }
+  .grid-3 { grid-template-columns:repeat(3,1fr); }
+  .grid-2 { grid-template-columns:repeat(2,1fr); }
+  .grid-7-5 { grid-template-columns:7fr 5fr; }
+  .grid-5-7 { grid-template-columns:5fr 7fr; }
+  @media(max-width:900px) { .grid-3,.grid-2,.grid-7-5,.grid-5-7 { grid-template-columns:1fr; } }
+
+  /* CARD */
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
+  .card-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-dim); margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+  .card-title::before { content:''; width:3px; height:11px; background:var(--yellow); border-radius:2px; display:inline-block; flex-shrink:0; }
+
+  /* STATUS ITEMS */
+  .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .stat-item { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px; }
+  .stat-item.full { grid-column:span 2; }
+  .stat-item.highlight { background:var(--yellow-bg); border-color:var(--yellow-border); }
+  .stat-label { font-size:10px; color:var(--text-dim); margin-bottom:3px; }
+  .stat-value { font-size:20px; font-weight:800; color:var(--yellow); line-height:1; }
+  .stat-value.big { font-size:26px; }
+  .stat-value.red { color:var(--red); }
+  .stat-sub { font-size:10px; color:var(--text-muted); margin-top:3px; }
+  .phase-badge { display:inline-flex; align-items:center; gap:5px; background:var(--yellow); color:#000; font-size:10px; font-weight:800; padding:3px 10px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px; }
+
+  /* PROGRESS */
+  .progress-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .progress-label { font-size:13px; font-weight:600; }
+  .progress-pct { font-size:22px; font-weight:800; color:var(--yellow); }
+  .progress-track { height:8px; background:var(--surface3); border-radius:4px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--yellow-dim),var(--yellow)); border-radius:4px; transition:width 0.4s ease; }
+  .progress-info { display:flex; justify-content:space-between; margin-top:5px; font-size:11px; color:var(--text-muted); }
+
+  /* TASKS */
+  .week-header { font-size:11px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.07em; margin:14px 0 8px; display:flex; align-items:center; gap:8px; }
+  .week-header::after { content:''; flex:1; height:1px; background:var(--border); }
+  .task-list { display:flex; flex-direction:column; gap:5px; }
+  .task-item { display:flex; align-items:flex-start; gap:10px; padding:10px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:7px; cursor:pointer; transition:border-color 0.15s; user-select:none; }
+  .task-item:hover { border-color:rgba(245,197,24,0.3); }
+  .task-item.done { opacity:0.5; }
+  .task-item.done .task-text { text-decoration:line-through; color:var(--text-dim); }
+  .task-check { width:17px; height:17px; border:2px solid var(--text-muted); border-radius:4px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+  .task-check.checked { background:var(--yellow); border-color:var(--yellow); }
+  .task-check.checked::after { content:'✓'; font-size:10px; font-weight:900; color:#000; line-height:1; }
+  .task-body { flex:1; min-width:0; }
+  .task-text { font-size:12px; color:var(--text); }
+  .task-meta { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .task-badge { font-size:10px; padding:2px 7px; border-radius:10px; font-weight:700; flex-shrink:0; margin-top:1px; }
+  .badge-you { background:rgba(245,197,24,0.12); color:var(--yellow-dim); }
+  .badge-tech { background:rgba(59,130,246,0.12); color:#93c5fd; }
+  .badge-sm { background:rgba(167,139,250,0.12); color:#c4b5fd; }
+  .badge-all { background:rgba(34,197,94,0.12); color:#86efac; }
+
+  /* KPI */
+  .kpi-row { display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center; padding:10px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; margin-bottom:6px; }
+  .kpi-name { font-size:12px; font-weight:500; }
+  .kpi-value { font-size:13px; font-weight:700; text-align:right; }
+  .kpi-meta { font-size:10px; color:var(--text-muted); text-align:right; }
+  .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .dot-green { background:var(--green); box-shadow:0 0 5px var(--green); }
+  .dot-yellow { background:var(--yellow); box-shadow:0 0 5px var(--yellow); }
+  .dot-red { background:var(--red); box-shadow:0 0 5px var(--red); }
+  .kpi-signal { display:flex; align-items:center; gap:6px; font-size:10px; color:var(--text-muted); }
+
+  /* CAMPAIGNS TABLE */
+  .camp-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .camp-table th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); padding:7px 8px; text-align:left; border-bottom:1px solid var(--border); }
+  .camp-table td { padding:9px 8px; border-bottom:1px solid #1e1e1e; color:var(--text); }
+  .camp-table tr:last-child td { border-bottom:none; }
+  .camp-table tr:hover td { background:var(--surface2); }
+  .cpa-ok { color:var(--green); font-weight:700; }
+  .cpa-warn { color:var(--orange); font-weight:700; }
+  .cpa-bad { color:var(--red); font-weight:700; }
+
+  /* CALENDAR */
+  .cal-item { display:grid; grid-template-columns:28px 90px 70px 55px 1fr; gap:8px; align-items:center; padding:9px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:7px; margin-bottom:5px; }
+  .cal-item.today { border-color:var(--yellow-border); background:var(--yellow-bg); }
+  .cal-num { font-size:15px; font-weight:800; color:var(--yellow); text-align:center; }
+  .cal-pilar { font-size:10px; font-weight:600; }
+  .cal-titulo { font-size:12px; font-weight:600; }
+  .cal-cta { font-size:10px; color:var(--text-muted); font-style:italic; }
+  .fmt-reel { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; background:rgba(59,130,246,0.15); color:#93c5fd; }
+  .fmt-carr { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; background:rgba(167,139,250,0.15); color:#c4b5fd; }
+  .fn-topo { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; background:rgba(34,197,94,0.12); color:#86efac; }
+  .fn-meio { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; background:rgba(245,197,24,0.12); color:var(--yellow-dim); }
+  .fn-fundo { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; background:rgba(239,68,68,0.12); color:#fca5a5; }
+  @media(max-width:600px) { .cal-item { grid-template-columns:24px 1fr 55px; } .cal-pilar,.cal-cta { display:none; } }
+
+  /* ALERTS */
+  .alert-item { display:flex; gap:10px; padding:11px 13px; border-radius:8px; border-left:3px solid; margin-bottom:6px; }
+  .alert-red { background:rgba(239,68,68,0.07); border-color:var(--red); }
+  .alert-yellow { background:rgba(245,197,24,0.07); border-color:var(--yellow); }
+  .alert-orange { background:rgba(249,115,22,0.07); border-color:var(--orange); }
+  .alert-icon { font-size:14px; flex-shrink:0; line-height:1.3; }
+  .alert-text { font-size:12px; }
+  .alert-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+  /* FUNIL */
+  .funil-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .funil-lbl { font-size:11px; color:var(--text-dim); width:50px; flex-shrink:0; }
+  .funil-bars { flex:1; display:flex; flex-direction:column; gap:3px; }
+  .funil-track { height:14px; background:var(--surface3); border-radius:3px; overflow:hidden; }
+  .funil-fill { height:100%; border-radius:3px; display:flex; align-items:center; padding-left:6px; font-size:9px; font-weight:700; color:#000; }
+  .funil-tag { font-size:9px; width:32px; text-align:right; flex-shrink:0; }
+
+  /* CONVERSION */
+  .conv-row { display:flex; justify-content:space-between; font-size:12px; padding:8px 10px; background:var(--surface2); border-radius:6px; border:1px solid var(--border); margin-bottom:4px; }
+  .conv-val { color:var(--yellow); font-weight:700; }
+
+  /* FOOTER */
+  footer { text-align:center; padding:20px; color:var(--text-muted); font-size:11px; border-top:1px solid var(--border); margin-top:8px; }
+  footer span { color:var(--yellow); }
+
+  /* SAVE TOAST */
+  .toast { position:fixed; bottom:20px; right:20px; background:var(--surface); border:1px solid var(--yellow-border); color:var(--yellow); font-size:12px; font-weight:600; padding:8px 16px; border-radius:8px; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:999; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">✓ Progresso salvo</div>
+
+<header>
+  <div class="header-left">
+    <div class="logo-mark">FM</div>
+    <div>
+      <div class="header-title">@fabriciomourateam</div>
+      <div class="header-sub">Painel de Comando — Instagram Organico</div>
+    </div>
+  </div>
+  <div class="header-date">Dia <span id="diaAtual">1</span> de 90</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('visao')">Visao Geral</div>
+  <div class="tab" onclick="showTab('fase1')">Fase 1 — Fundacao</div>
+  <div class="tab" onclick="showTab('fase2')">Fase 2 — Aceleracao</div>
+  <div class="tab" onclick="showTab('fase3')">Fase 3 — Monetizacao</div>
+  <div class="tab" onclick="showTab('google')">Google Ads</div>
+  <div class="tab" onclick="showTab('calendario')">Calendario</div>
+</div>
+
+<!-- ===== VISÃO GERAL ===== -->
+<div class="section active" id="tab-visao">
+  <div class="grid grid-3" style="margin-bottom:16px;">
+
+    <!-- STATUS -->
+    <div class="card">
+      <div class="card-title">Status Atual</div>
+      <div class="phase-badge">Fase 1 — Fundacao</div>
+      <div class="stat-grid">
+        <div class="stat-item highlight full">
+          <div class="stat-label">Seguidores</div>
+          <div class="stat-value big">85.400</div>
+          <div class="stat-sub">Meta 90d: 120-130k &nbsp;|&nbsp; +35-45k a conquistar</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Dia do Projeto</div>
+          <div class="stat-value" id="statDia">1</div>
+          <div class="stat-sub">Semana 1 de 12</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Vendas Insta</div>
+          <div class="stat-value red">0</div>
+          <div class="stat-sub">Meta mes 1: 3+ vendas</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Fat. Instagram</div>
+          <div class="stat-value red">R$ 0</div>
+          <div class="stat-sub">Meta 90d: R$60-100k</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">CPA Google</div>
+          <div class="stat-value" style="color:var(--orange);font-size:16px;">R$15,94</div>
+          <div class="stat-sub">Meta: R$ 13,00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESSO GERAL -->
+    <div class="card">
+      <div class="card-title">Progresso Geral — 90 Dias</div>
+      <div class="progress-header">
+        <span class="progress-label">Tarefas concluidas</span>
+        <span class="progress-pct" id="pctGeral">0%</span>
+      </div>
+      <div class="progress-track" style="margin-bottom:6px;">
+        <div class="progress-fill" id="barGeral" style="width:0%"></div>
+      </div>
+      <div class="progress-info">
+        <span id="infoGeral">0 de 47 tarefas</span>
+        <span style="color:var(--yellow);">Fase 1 em foco</span>
+      </div>
+
+      <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;"><span style="color:var(--text-dim);">Fase 1 — Fundacao</span><span id="pct1" style="color:var(--yellow);font-weight:700;">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="bar1" style="width:0%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;"><span style="color:var(--text-dim);">Fase 2 — Aceleracao</span><span id="pct2" style="color:var(--yellow);font-weight:700;">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="bar2" style="width:0%;background:linear-gradient(90deg,#f97316,#eab308)"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;"><span style="color:var(--text-dim);">Fase 3 — Monetizacao</span><span id="pct3" style="color:var(--yellow);font-weight:700;">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="bar3" style="width:0%;background:linear-gradient(90deg,var(--yellow-dim),var(--yellow))"></div></div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+        <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;font-weight:700;">Metas 90 Dias</div>
+        <div class="conv-row"><span>Seguidores</span><span class="conv-val">120-130k</span></div>
+        <div class="conv-row"><span>Vendas Instagram/mes</span><span class="conv-val">30-50</span></div>
+        <div class="conv-row"><span>Faturamento Insta/mes</span><span class="conv-val">R$60-100k</span></div>
+        <div class="conv-row"><span>CPA Google</span><span class="conv-val">R$ 13,00</span></div>
+      </div>
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="card">
+      <div class="card-title">Alertas Ativos</div>
+      <div class="alert-item alert-red">
+        <div class="alert-icon">🔴</div>
+        <div>
+          <div class="alert-text">Bio antiga ainda no ar</div>
+          <div class="alert-sub">Sem garantia explicita — trocar em 5 min</div>
+        </div>
+      </div>
+      <div class="alert-item alert-red">
+        <div class="alert-icon">🔴</div>
+        <div>
+          <div class="alert-text">Pixel Meta NAO instalado</div>
+          <div class="alert-sub">Perdendo leads de remarketing todo dia</div>
+        </div>
+      </div>
+      <div class="alert-item alert-red">
+        <div class="alert-icon">🔴</div>
+        <div>
+          <div class="alert-text">PMax pausado por politica</div>
+          <div class="alert-sub">+9% de impacto estimado — resolver urgente</div>
+        </div>
+      </div>
+      <div class="alert-item alert-yellow">
+        <div class="alert-icon">🟡</div>
+        <div>
+          <div class="alert-text">Mix de funil: 90/10/0</div>
+          <div class="alert-sub">Meta e 50/33/17. Briefar SM esta semana.</div>
+        </div>
+      </div>
+      <div class="alert-item alert-yellow">
+        <div class="alert-icon">🟡</div>
+        <div>
+          <div class="alert-text">Pontuacao Google caindo (-4%)</div>
+          <div class="alert-sub">73,5% — 12 recomendacoes nao aplicadas</div>
+        </div>
+      </div>
+      <div class="alert-item alert-orange">
+        <div class="alert-icon">🟠</div>
+        <div>
+          <div class="alert-text">0 leads no CRM Instagram</div>
+          <div class="alert-sub">Bot DM precisa ser validado</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+        <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;font-weight:700;">Mix de Funil</div>
+        <div class="funil-row">
+          <div class="funil-lbl">Topo</div>
+          <div class="funil-bars">
+            <div class="funil-track"><div class="funil-fill" style="width:90%;background:linear-gradient(90deg,#ef4444,#f87171);">90%</div></div>
+            <div class="funil-track"><div class="funil-fill" style="width:50%;background:linear-gradient(90deg,var(--green),#86efac);">50%</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;"><div class="funil-tag" style="color:var(--red);">atual</div><div class="funil-tag" style="color:var(--green);">meta</div></div>
+        </div>
+        <div class="funil-row">
+          <div class="funil-lbl">Meio</div>
+          <div class="funil-bars">
+            <div class="funil-track"><div class="funil-fill" style="width:10%;background:#ef4444;min-width:18px;">10%</div></div>
+            <div class="funil-track"><div class="funil-fill" style="width:33%;background:linear-gradient(90deg,var(--yellow-dim),var(--yellow));">33%</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;"><div class="funil-tag" style="color:var(--red);">atual</div><div class="funil-tag" style="color:var(--green);">meta</div></div>
+        </div>
+        <div class="funil-row">
+          <div class="funil-lbl">Fundo</div>
+          <div class="funil-bars">
+            <div class="funil-track"><div class="funil-fill" style="width:1%;background:#ef4444;min-width:18px;">0%</div></div>
+            <div class="funil-track"><div class="funil-fill" style="width:17%;background:linear-gradient(90deg,var(--yellow-dim),var(--yellow));">17%</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px;"><div class="funil-tag" style="color:var(--red);">atual</div><div class="funil-tag" style="color:var(--green);">meta</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FASE 1 ===== -->
+<div class="section" id="tab-fase1">
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Progresso Fase 1</div>
+      <div class="progress-header">
+        <span class="progress-label">Fundacao (Dias 1-30)</span>
+        <span class="progress-pct" id="pctF1">0%</span>
+      </div>
+      <div class="progress-track" style="margin-bottom:6px;"><div class="progress-fill" id="barF1" style="width:0%"></div></div>
+      <div class="progress-info"><span id="infoF1">0 tarefas concluidas</span><span>KPI: +5-10k seguidores | 3+ vendas</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Marcos da Fase 1</div>
+      <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;">
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">🎯 Bio + foto + 4 highlights no ar</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">📸 30 Reels gravados em bloco</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">🌐 Landing /time no ar</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">🤖 Bot DM com qualificacao 3 niveis</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">📊 Pixel Meta instalado</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">Tarefas — Fase 1</div>
+
+    <div class="week-header">Semana 1 — Urgente</div>
+    <div class="task-list" id="tasks-fase1-sem1"></div>
+
+    <div class="week-header">Semana 2</div>
+    <div class="task-list" id="tasks-fase1-sem2"></div>
+
+    <div class="week-header">Semana 3</div>
+    <div class="task-list" id="tasks-fase1-sem3"></div>
+
+    <div class="week-header">Semana 4</div>
+    <div class="task-list" id="tasks-fase1-sem4"></div>
+  </div>
+</div>
+
+<!-- ===== FASE 2 ===== -->
+<div class="section" id="tab-fase2">
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Progresso Fase 2</div>
+      <div class="progress-header">
+        <span class="progress-label">Aceleracao (Dias 31-60)</span>
+        <span class="progress-pct" id="pctF2">0%</span>
+      </div>
+      <div class="progress-track" style="margin-bottom:6px;"><div class="progress-fill" id="barF2" style="width:0%"></div></div>
+      <div class="progress-info"><span id="infoF2">0 tarefas concluidas</span><span>KPI: 1.000+ leads | 10-15 vendas/mes</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Marcos da Fase 2</div>
+      <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;">
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">📲 2 Reels/dia consistente</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">🤝 2 collabs com perfis complementares</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">📄 Lead magnet "Guia dos 7 Exames"</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">🎙️ 1 Live de autoridade (60-90min)</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">📋 1.000+ leads na lista</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">Tarefas — Fase 2</div>
+    <div class="week-header">Semana 5</div>
+    <div class="task-list" id="tasks-fase2-sem5"></div>
+    <div class="week-header">Semana 6</div>
+    <div class="task-list" id="tasks-fase2-sem6"></div>
+    <div class="week-header">Semana 7</div>
+    <div class="task-list" id="tasks-fase2-sem7"></div>
+    <div class="week-header">Semana 8</div>
+    <div class="task-list" id="tasks-fase2-sem8"></div>
+  </div>
+</div>
+
+<!-- ===== FASE 3 ===== -->
+<div class="section" id="tab-fase3">
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="card-title">Progresso Fase 3</div>
+      <div class="progress-header">
+        <span class="progress-label">Monetizacao (Dias 61-90)</span>
+        <span class="progress-pct" id="pctF3">0%</span>
+      </div>
+      <div class="progress-track" style="margin-bottom:6px;"><div class="progress-fill" id="barF3" style="width:0%"></div></div>
+      <div class="progress-info"><span id="infoF3">0 tarefas concluidas</span><span>KPI: R$60-100k/mes Instagram</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Marcos da Fase 3</div>
+      <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;">
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">🚀 Lancamento estruturado de 5 dias</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">💬 Fluxo de nutricao WhatsApp 30 dias</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">📊 Analise completa 90 dias</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">🎯 30-50 vendas/mes Instagram</div>
+        <div style="padding:7px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">💰 Fat. total: R$250-360k/mes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">Tarefas — Fase 3</div>
+    <div class="week-header">Semana 9</div>
+    <div class="task-list" id="tasks-fase3-sem9"></div>
+    <div class="week-header">Semana 10</div>
+    <div class="task-list" id="tasks-fase3-sem10"></div>
+    <div class="week-header">Semana 11</div>
+    <div class="task-list" id="tasks-fase3-sem11"></div>
+    <div class="week-header">Semana 12</div>
+    <div class="task-list" id="tasks-fase3-sem12"></div>
+  </div>
+</div>
+
+<!-- ===== GOOGLE ADS ===== -->
+<div class="section" id="tab-google">
+  <div class="grid grid-2" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-title">KPIs Google Ads vs Meta</div>
+      <div class="kpi-row">
+        <div class="kpi-name">CPA Medio</div>
+        <div><div class="kpi-value" style="color:var(--orange)">R$ 15,94</div><div class="kpi-meta">Meta: R$ 13,00</div></div>
+        <div class="kpi-signal"><div class="dot dot-yellow"></div><span>-18,4% a reduzir</span></div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-name">Pontuacao Otimizacao</div>
+        <div><div class="kpi-value" style="color:var(--red)">73,5%</div><div class="kpi-meta">Meta: 85%+</div></div>
+        <div class="kpi-signal"><div class="dot dot-red"></div><span>Caindo 4%</span></div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-name">CPC Medio</div>
+        <div><div class="kpi-value" style="color:var(--orange)">R$ 2,30</div><div class="kpi-meta">Meta: R$ 1,90</div></div>
+        <div class="kpi-signal"><div class="dot dot-yellow"></div><span>-17,4% a reduzir</span></div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-name">Conversoes / mes</div>
+        <div><div class="kpi-value" style="color:var(--yellow)">1.952</div><div class="kpi-meta">Meta: 2.300+</div></div>
+        <div class="kpi-signal"><div class="dot dot-yellow"></div><span>+17,8% a crescer</span></div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-name">Faturamento Google</div>
+        <div><div class="kpi-value" style="color:var(--green)">R$ 160k</div><div class="kpi-meta">Meta: R$195-220k</div></div>
+        <div class="kpi-signal"><div class="dot dot-green"></div><span>ROI 4-6x</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recomendacoes — Por Prioridade</div>
+      <div class="task-list" id="tasks-google"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Campanhas Ativas</div>
+    <table class="camp-table">
+      <thead><tr><th>Campanha</th><th>Tipo</th><th>Orcamento/dia</th><th>Custo 30d</th><th>Conv</th><th>CPA</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td style="font-size:11px">[SEARCH] [F.FUNIL] [PRINCIPAL]</td><td>Pesquisa</td><td>R$ 980</td><td>R$ 18.715</td><td>1.081</td><td class="cpa-warn">R$ 17,31</td><td style="color:var(--red);font-size:11px">🔴 Limitada</td></tr>
+        <tr><td style="font-size:11px">Fim de semana</td><td>Pesquisa</td><td>R$ 800</td><td>R$ 6.394</td><td>346</td><td class="cpa-warn">R$ 18,48</td><td style="color:var(--red);font-size:11px">🔴 Limitada</td></tr>
+        <tr><td style="font-size:11px">[SEARCH] [M.FUNIL]</td><td>Pesquisa</td><td>R$ 156</td><td>R$ 4.770</td><td>445</td><td class="cpa-ok">R$ 10,72</td><td style="color:var(--red);font-size:11px">🔴 Limitada</td></tr>
+        <tr><td style="font-size:11px">Display RMKT</td><td>Display</td><td>R$ 48</td><td>R$ 1.099</td><td>71</td><td class="cpa-ok">R$ 15,50</td><td style="color:var(--green);font-size:11px">🟢 Qualificada</td></tr>
+        <tr><td style="font-size:11px">[Institucional] Fabricio Moura</td><td>Pesquisa</td><td>R$ 23</td><td>R$ 140</td><td>9,5</td><td class="cpa-ok">R$ 14,79</td><td style="color:var(--yellow-dim);font-size:11px">🟠 Pouca busca</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== CALENDARIO ===== -->
+<div class="section" id="tab-calendario">
+  <div class="card">
+    <div class="card-title">Calendario Editorial — 30 Dias</div>
+    <div id="cal-grid"></div>
+  </div>
+</div>
+
+<footer>Dashboard — <span>@fabriciomourateam</span> &nbsp;|&nbsp; Fase 1: Fundacao (Dias 1-30) &nbsp;|&nbsp; Progresso salvo no navegador</footer>
+
+<script>
+// ===== SUPABASE =====
+const SUPA_URL = 'https://qhzifnyjyxdushxorzrk.supabase.co';
+const SUPA_KEY = 'sb_publishable_qph0mJ7a0tVoMhXs6yF6ZQ_k8HgA2FR';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// Cache local para performance (fallback offline)
+const cache = {};
+
+async function loadProgress() {
+  try {
+    const { data } = await supa.from('instagram_progress').select('task_id, done');
+    if (data) data.forEach(r => { cache[r.task_id] = r.done; });
+  } catch(e) {
+    // offline: usa localStorage como fallback
+    Object.keys(localStorage).forEach(k => { if (k.startsWith('f') || k.startsWith('g')) cache[k] = localStorage.getItem(k) === '1'; });
+  }
+}
+
+async function saveTask(id, done) {
+  cache[id] = done;
+  localStorage.setItem(id, done ? '1' : '0');
+  try {
+    await supa.from('instagram_progress').upsert({ task_id: id, done, updated_at: new Date().toISOString() });
+  } catch(e) { /* salvo no cache/localStorage */ }
+}
+
+function isDone(id) { return !!cache[id]; }
+
+// ===== DADOS DAS TAREFAS =====
+const TASKS = {
+  'fase1-sem1': [
+    { id:'f1s1t1', text:'Atualizar bio (versao nova com garantia)', meta:'Voce · 5 min', badge:'you' },
+    { id:'f1s1t2', text:'Trocar foto de perfil (fundo neutro/colorido)', meta:'Voce · 1h', badge:'you' },
+    { id:'f1s1t3', text:'Criar 4 highlights (Quem sou / Metodo / Resultados / FAQ)', meta:'Voce + SM · 4h', badge:'all' },
+    { id:'f1s1t4', text:'Pinar 3 posts estrategicos (autoridade + prova + educativo)', meta:'Voce · 10 min', badge:'you' },
+    { id:'f1s1t5', text:'Briefing tecnico de otimizacao da landing', meta:'Voce → Tecnico · 1h', badge:'tech' },
+    { id:'f1s1t6', text:'Instalar Pixel Meta na landing', meta:'Tecnico · 30 min', badge:'tech' },
+    { id:'f1s1t7', text:'Aplicar 6 recomendacoes Google Ads Prioridade 3', meta:'Voce · 1h', badge:'you' },
+    { id:'f1s1t8', text:'Redistribuir orcamento Google Ads conforme tabela', meta:'Voce · 15 min', badge:'you' },
+    { id:'f1s1t9', text:'Resolver politica do PMax pausado', meta:'Voce · 2h', badge:'you' },
+  ],
+  'fase1-sem2': [
+    { id:'f1s2t1', text:'Gravar 30 Reels em bloco', meta:'Voce + SM · 1 dia', badge:'all' },
+    { id:'f1s2t2', text:'Gravar 3 versoes do VSL para landing', meta:'Voce · 1h', badge:'you' },
+    { id:'f1s2t3', text:'Briefar social media sobre mix 50/33/17', meta:'Voce · 1h', badge:'you' },
+    { id:'f1s2t4', text:'Criar landing /time para Instagram', meta:'Tecnico · 2 dias', badge:'tech' },
+    { id:'f1s2t5', text:'Configurar GA4 + eventos de conversao', meta:'Tecnico · 2h', badge:'tech' },
+    { id:'f1s2t6', text:'Definir e implementar Customer Match no Google Ads', meta:'Voce + Tecnico · 2h', badge:'all' },
+    { id:'f1s2t7', text:'Reuniao com closer sobre objecoes de leads Insta', meta:'Voce · 1h', badge:'you' },
+  ],
+  'fase1-sem3': [
+    { id:'f1s3t1', text:'Postar 1 Reel/dia minimo', meta:'SM · diario', badge:'sm' },
+    { id:'f1s3t2', text:'Stories diarios (5+ frames)', meta:'Voce + SM · diario', badge:'all' },
+    { id:'f1s3t3', text:'Adicionar CTA com palavra-codigo nos Reels', meta:'SM · sempre', badge:'sm' },
+    { id:'f1s3t4', text:'Validar fluxo do bot DM com qualificacao 3 niveis', meta:'Voce · 2h', badge:'you' },
+    { id:'f1s3t5', text:'Refazer FAQ na landing (8 perguntas)', meta:'Tecnico · 1h', badge:'tech' },
+    { id:'f1s3t6', text:'Adicionar VSL no topo da landing principal', meta:'Tecnico · 30 min', badge:'tech' },
+  ],
+  'fase1-sem4': [
+    { id:'f1s4t1', text:'Primeiro teste de "abertura de vagas"', meta:'Voce · 1 semana', badge:'you' },
+    { id:'f1s4t2', text:'Analise KPIs primeiro mes', meta:'Voce · 2h', badge:'you' },
+    { id:'f1s4t3', text:'Ajustar pauta de conteudo com base no que performou', meta:'Voce + SM · 2h', badge:'all' },
+    { id:'f1s4t4', text:'Criar lead magnet PDF "Guia dos 7 Exames"', meta:'Voce + designer · 1 semana', badge:'all' },
+  ],
+  'fase2-sem5': [
+    { id:'f2s5t1', text:'Aumentar para 2 Reels/dia em 4 dias/semana', meta:'SM', badge:'sm' },
+    { id:'f2s5t2', text:'Mapear 10 perfis para collab', meta:'Voce', badge:'you' },
+    { id:'f2s5t3', text:'Postar primeiro Reel reativo', meta:'Voce + SM', badge:'all' },
+  ],
+  'fase2-sem6': [
+    { id:'f2s6t1', text:'Fazer 2 collabs / mencoes cruzadas', meta:'Voce', badge:'you' },
+    { id:'f2s6t2', text:'Lancar lead magnet com campanha em stories', meta:'Voce', badge:'you' },
+    { id:'f2s6t3', text:'Configurar automacao WhatsApp pos-lead', meta:'Tecnico', badge:'tech' },
+  ],
+  'fase2-sem7': [
+    { id:'f2s7t1', text:'Acumular 1.000 leads na lista', meta:'Metrica passiva', badge:'all' },
+    { id:'f2s7t2', text:'Criar primeira sequencia de email de nutricao', meta:'Voce', badge:'you' },
+    { id:'f2s7t3', text:'Reel de "convite a comunidade"', meta:'Voce + SM', badge:'all' },
+  ],
+  'fase2-sem8': [
+    { id:'f2s8t1', text:'Live de autoridade (60-90min)', meta:'Voce', badge:'you' },
+    { id:'f2s8t2', text:'Cortar live em 10 Reels para proximos 30 dias', meta:'SM', badge:'sm' },
+    { id:'f2s8t3', text:'Analise KPIs segundo mes', meta:'Voce · 2h', badge:'you' },
+  ],
+  'fase3-sem9': [
+    { id:'f3s9t1', text:'Estruturar oferta de "plano 2 anos" com desconto', meta:'Voce', badge:'you' },
+    { id:'f3s9t2', text:'Definir janela mensal de matricula', meta:'Voce', badge:'you' },
+  ],
+  'fase3-sem10': [
+    { id:'f3s10t1', text:'Primeiro lancamento estruturado (5 dias)', meta:'Voce', badge:'you' },
+    { id:'f3s10t2', text:'Roteiro completo (aquecimento + live + carrinho)', meta:'Voce', badge:'you' },
+  ],
+  'fase3-sem11': [
+    { id:'f3s11t1', text:'Implementar fluxo de nutricao WhatsApp 30 dias', meta:'Tecnico', badge:'tech' },
+    { id:'f3s11t2', text:'Treinar closer com objecoes especificas Instagram', meta:'Voce', badge:'you' },
+  ],
+  'fase3-sem12': [
+    { id:'f3s12t1', text:'Analise completa 90 dias', meta:'Voce · 2h', badge:'you' },
+    { id:'f3s12t2', text:'Definir KPIs e estrategia proximos 90 dias', meta:'Voce', badge:'you' },
+    { id:'f3s12t3', text:'Decidir investimentos proximos (editor, agencia)', meta:'Voce', badge:'you' },
+  ],
+};
+
+const GOOGLE_TASKS = [
+  { id:'gt1', text:'🔴 Resolver politica e reativar PMax (+9%)', meta:'Prioridade 1 — urgente', badge:'you' },
+  { id:'gt2', text:'🔴 Otimizar orcamentos conforme tabela (+7,2%)', meta:'Prioridade 1 — urgente', badge:'you' },
+  { id:'gt3', text:'🟡 Criar campanha Gen Demand com Reels (+5,7%)', meta:'Prioridade 2 — 2 semanas', badge:'all' },
+  { id:'gt4', text:'🟡 Upload Customer Match (+2,2%)', meta:'Prioridade 2 — 2 semanas', badge:'tech' },
+  { id:'gt5', text:'🟡 Definir CPA-alvo R$15 nas campanhas Pesquisa', meta:'Prioridade 2 — 2 semanas', badge:'you' },
+  { id:'gt6', text:'🟢 Adicionar logo da empresa nos anuncios', meta:'Prioridade 3 — 15 min', badge:'you' },
+  { id:'gt7', text:'🟢 Adicionar 5-10 imagens nos anuncios', meta:'Prioridade 3 — 15 min', badge:'you' },
+  { id:'gt8', text:'🟢 Adicionar snippets estruturados', meta:'Prioridade 3 — 15 min', badge:'you' },
+  { id:'gt9', text:'🟢 Melhorar anuncios responsivos de pesquisa', meta:'Prioridade 3 — 15 min', badge:'you' },
+  { id:'gt10', text:'🟢 Melhorar anuncios responsivos de display', meta:'Prioridade 3 — 15 min', badge:'you' },
+  { id:'gt11', text:'🟢 Remover palavras-chave redundantes', meta:'Prioridade 3 — 15 min', badge:'you' },
+];
+
+const CALENDARIO = [
+  { dia:1, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'TRT — 3 erros fatais', cta:'Comenta TRT', today:true },
+  { dia:2, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Carbo no cutting', cta:'Comenta CARBO' },
+  { dia:3, pilar:'Prova social', formato:'Carrossel', funil:'Meio', titulo:'Caso aluno — 6 meses', cta:'Link na bio' },
+  { dia:4, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'Como funciona consultoria', cta:'Link na bio' },
+  { dia:5, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Mounjaro — o real', cta:'Comenta MOUNJARO' },
+  { dia:6, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'Garantia explicita', cta:'Link na bio' },
+  { dia:7, pilar:'Recomposicao', formato:'Carrossel', funil:'Topo', titulo:'Pele flacida', cta:'Salva' },
+  { dia:8, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'Painel acompanhamento', cta:'Compartilha' },
+  { dia:9, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Peptideos GHK BPC', cta:'Comenta PEPT' },
+  { dia:10, pilar:'Prova social', formato:'Reel', funil:'Meio', titulo:'Depoimento aluno', cta:'Link na bio' },
+  { dia:11, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Pesagem diaria', cta:'Comenta PESO' },
+  { dia:12, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'Quebra objecao preco', cta:'Link na bio' },
+  { dia:13, pilar:'Hormonios', formato:'Carrossel', funil:'Meio', titulo:'Oxandrolona guia', cta:'Salva' },
+  { dia:14, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'Diferencial', cta:'Comenta CONSULTORIA' },
+  { dia:15, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Suplementacao 85% lixo', cta:'Comenta SUPLE' },
+  { dia:16, pilar:'Prova social', formato:'Reel', funil:'Meio', titulo:'Tour 7 paises', cta:'Link na bio' },
+  { dia:17, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Mulher hormonizada 73%', cta:'Compartilha' },
+  { dia:18, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'Abertura de vagas', cta:'Link na bio' },
+  { dia:19, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Sono e ganho de musculo', cta:'Salva' },
+  { dia:20, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'Erro proprio que mudou metodo', cta:'Me segue' },
+  { dia:21, pilar:'Hormonios', formato:'Carrossel', funil:'Meio', titulo:'Exames antes do TRT', cta:'Salva' },
+  { dia:22, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Volume vs Intensidade', cta:'Salva' },
+  { dia:23, pilar:'Prova social', formato:'Carrossel', funil:'Meio', titulo:'Antes/depois feminino', cta:'Link na bio' },
+  { dia:24, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'Ultima chamada 5 vagas', cta:'Link na bio' },
+  { dia:25, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Natural vs Hormonizado', cta:'Compartilha' },
+  { dia:26, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'FAQ em video', cta:'Link na bio' },
+  { dia:27, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Refeicao livre fim de semana', cta:'Comenta LIVRE' },
+  { dia:28, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Mulher com peso pesado', cta:'Compartilha' },
+  { dia:29, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'CTA puro a camera', cta:'Manda mensagem' },
+  { dia:30, pilar:'Prova social', formato:'Reel', funil:'Meio', titulo:'Caso clinico 14kg', cta:'Link na bio' },
+];
+
+// ===== BADGES =====
+function badge(type) {
+  const map = { you:'badge-you', tech:'badge-tech', sm:'badge-sm', all:'badge-all' };
+  const label = { you:'Voce', tech:'Tech', sm:'SM', all:'Voce+SM' };
+  return `<span class="task-badge ${map[type]}">${label[type]}</span>`;
+}
+
+// ===== RENDER TASKS =====
+function renderTasks(containerId, tasks) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '';
+  tasks.forEach(t => {
+    const checked = isDone(t.id);
+    const div = document.createElement('div');
+    div.className = 'task-item' + (checked ? ' done' : '');
+    div.dataset.id = t.id;
+    div.innerHTML = `
+      <div class="task-check${checked ? ' checked' : ''}"></div>
+      <div class="task-body">
+        <div class="task-text">${t.text}</div>
+        <div class="task-meta">${t.meta}</div>
+      </div>
+      ${badge(t.badge)}
+    `;
+    div.addEventListener('click', () => toggleTask(t.id, div));
+    el.appendChild(div);
+  });
+}
+
+async function toggleTask(id, el) {
+  const checked = isDone(id);
+  const novo = !checked;
+  el.classList.toggle('done', novo);
+  el.querySelector('.task-check').classList.toggle('checked', novo);
+  await saveTask(id, novo);
+  updateProgress();
+  showToast();
+}
+
+// ===== PROGRESS =====
+function countPhase(keys) {
+  let total = 0, done = 0;
+  keys.forEach(k => {
+    const tasks = TASKS[k] || [];
+    total += tasks.length;
+    tasks.forEach(t => { if (isDone(t.id)) done++; });
+  });
+  return { total, done };
+}
+
+function setPct(elPct, elBar, done, total) {
+  const pct = total === 0 ? 0 : Math.round(done / total * 100);
+  if (elPct) elPct.textContent = pct + '%';
+  if (elBar) elBar.style.width = pct + '%';
+  return { pct, done, total };
+}
+
+function updateProgress() {
+  const f1keys = ['fase1-sem1','fase1-sem2','fase1-sem3','fase1-sem4'];
+  const f2keys = ['fase2-sem5','fase2-sem6','fase2-sem7','fase2-sem8'];
+  const f3keys = ['fase3-sem9','fase3-sem10','fase3-sem11','fase3-sem12'];
+
+  const f1 = countPhase(f1keys);
+  const f2 = countPhase(f2keys);
+  const f3 = countPhase(f3keys);
+  const all = { done: f1.done+f2.done+f3.done, total: f1.total+f2.total+f3.total };
+
+  // Google tasks
+  let gDone = 0;
+  GOOGLE_TASKS.forEach(t => { if (localStorage.getItem(t.id) === '1') gDone++; });
+
+  // Geral
+  setPct(document.getElementById('pctGeral'), document.getElementById('barGeral'), all.done, all.total);
+  const ig = document.getElementById('infoGeral');
+  if (ig) ig.textContent = `${all.done} de ${all.total} tarefas`;
+
+  // Por fase (visao geral)
+  const p1 = f1.total ? Math.round(f1.done/f1.total*100) : 0;
+  const p2 = f2.total ? Math.round(f2.done/f2.total*100) : 0;
+  const p3 = f3.total ? Math.round(f3.done/f3.total*100) : 0;
+  ['pct1','pct2','pct3'].forEach((id,i) => { const e=document.getElementById(id); if(e) e.textContent=[p1,p2,p3][i]+'%'; });
+  ['bar1','bar2','bar3'].forEach((id,i) => { const e=document.getElementById(id); if(e) e.style.width=[p1,p2,p3][i]+'%'; });
+
+  // Fase tabs
+  setPct(document.getElementById('pctF1'), document.getElementById('barF1'), f1.done, f1.total);
+  setPct(document.getElementById('pctF2'), document.getElementById('barF2'), f2.done, f2.total);
+  setPct(document.getElementById('pctF3'), document.getElementById('barF3'), f3.done, f3.total);
+  const if1=document.getElementById('infoF1'); if(if1) if1.textContent=`${f1.done} de ${f1.total} tarefas`;
+  const if2=document.getElementById('infoF2'); if(if2) if2.textContent=`${f2.done} de ${f2.total} tarefas`;
+  const if3=document.getElementById('infoF3'); if(if3) if3.textContent=`${f3.done} de ${f3.total} tarefas`;
+}
+
+// ===== CALENDAR =====
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  if (!grid) return;
+  const funilClass = { Topo:'fn-topo', Meio:'fn-meio', Fundo:'fn-fundo' };
+  const formatClass = { Reel:'fmt-reel', Carrossel:'fmt-carr' };
+  const pilarColor = { Hormonios:'#86efac', Recomposicao:'#93c5fd', 'Prova social':'#fca5a5', Autoridade:'#fde68a', Conversao:'#c4b5fd' };
+  CALENDARIO.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'cal-item' + (d.today ? ' today' : '');
+    div.innerHTML = `
+      <div class="cal-num">${d.dia}</div>
+      <div class="cal-pilar" style="color:${pilarColor[d.pilar]||'#fff'}">${d.pilar}</div>
+      <span class="${formatClass[d.formato]||'fmt-reel'}">${d.formato}</span>
+      <span class="${funilClass[d.funil]||'fn-topo'}">${d.funil}</span>
+      <div><div class="cal-titulo">${d.titulo}</div><div class="cal-cta">CTA: ${d.cta}</div></div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// ===== TOAST =====
+let toastTimer;
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+// ===== TABS =====
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===== INIT =====
+async function init() {
+  // Dia do projeto
+  const inicio = new Date('2026-05-13');
+  const hoje = new Date();
+  const dia = Math.min(90, Math.max(1, Math.round((hoje - inicio) / (1000*60*60*24)) + 1));
+  document.getElementById('diaAtual').textContent = dia;
+  const sd = document.getElementById('statDia');
+  if (sd) sd.textContent = 'Dia ' + dia;
+
+  // Carrega progresso do Supabase antes de renderizar
+  const toast = document.getElementById('toast');
+  toast.textContent = '⏳ Carregando progresso...';
+  toast.classList.add('show');
+  await loadProgress();
+  toast.classList.remove('show');
+
+  // Renderiza tudo com estado correto
+  Object.entries(TASKS).forEach(([key, tasks]) => {
+    renderTasks('tasks-' + key, tasks);
+  });
+  renderTasks('tasks-google', GOOGLE_TASKS);
+  renderCalendar();
+  updateProgress();
+}
+
+init();
+</script>
+</body>
+</html>
