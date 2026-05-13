@@ -329,28 +329,51 @@
     .guarantee {
       background: var(--black);
       text-align: center;
+      padding: 80px 24px;
     }
     .guarantee-box {
-      background: var(--dark2);
-      border: 2px solid var(--yellow);
+      position: relative;
+      background: linear-gradient(135deg, #161616 0%, #1c1c1c 100%);
+      border: 1px solid #2e2e2e;
+      border-top: 3px solid var(--yellow);
       border-radius: 20px;
-      padding: 56px 40px;
-      max-width: 700px;
+      padding: 64px 48px;
+      max-width: 760px;
       margin: 0 auto;
+      overflow: hidden;
     }
-    .guarantee-seal {
-      width: 100px;
-      height: 100px;
-      background: var(--yellow);
-      border-radius: 50%;
+    .guarantee-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(245,197,24,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .guarantee-icon {
+      position: relative;
+      margin: 0 auto 32px;
+      width: 88px;
+      height: 88px;
+    }
+    .guarantee-icon svg { width: 88px; height: 88px; }
+    .guarantee-bullets {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin: 32px 0;
+    }
+    .guarantee-bullet {
       display: flex;
       align-items: center;
-      justify-content: center;
-      margin: 0 auto 28px;
-      font-size: 2.5rem;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #ccc;
+      font-weight: 500;
     }
-    .guarantee h2 { margin-bottom: 16px; }
-    .guarantee p { color: #bbb; font-size: 1rem; max-width: 520px; margin: 0 auto; }
+    .guarantee-bullet i { color: var(--yellow); font-size: 0.85rem; }
+    .guarantee h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin-bottom: 16px; position: relative; }
+    .guarantee .guarantee-text { color: #aaa; font-size: 1rem; max-width: 540px; margin: 0 auto; line-height: 1.8; position: relative; }
 
     /* ── FAQ ── */
     .faq { background: var(--dark); }
@@ -659,10 +682,20 @@
 <section class="guarantee">
   <div class="container">
     <div class="guarantee-box">
-      <div class="guarantee-seal">🛡️</div>
+      <div class="guarantee-icon">
+        <svg viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M44 6L10 20V44C10 62.4 25.2 79.4 44 84C62.8 79.4 78 62.4 78 44V20L44 6Z" fill="rgba(245,197,24,0.12)" stroke="#F5C518" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M30 44L40 54L58 36" stroke="#F5C518" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <p class="section-tag">100% livre de risco</p>
       <h2>Resultados ou seu investimento de volta</h2>
-      <p>Se você seguir o protocolo e não tiver resultados, eu devolvo 100% do seu investimento. Simples assim. A confiança no método é total — e a responsabilidade pelos seus resultados é minha.</p>
+      <p class="guarantee-text">Se você seguir o protocolo e não tiver resultados, eu devolvo 100% do seu investimento. Simples assim. A confiança no método é total e a responsabilidade pelos seus resultados é minha.</p>
+      <div class="guarantee-bullets">
+        <span class="guarantee-bullet"><i class="fa-solid fa-check"></i> Sem letras miúdas</span>
+        <span class="guarantee-bullet"><i class="fa-solid fa-check"></i> Devolução integral</span>
+        <span class="guarantee-bullet"><i class="fa-solid fa-check"></i> Risco zero pra você</span>
+      </div>
     </div>
   </div>
 </section>
