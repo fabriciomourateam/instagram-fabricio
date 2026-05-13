@@ -190,6 +190,40 @@
     }
     .hero-stat .label { font-size: 12px; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
 
+    /* ── PROOF BAR ── */
+    .proof-bar {
+      background: var(--dark);
+      border-bottom: 1px solid #1e1e1e;
+      padding: 16px 24px;
+    }
+    .proof-bar-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .proof-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .proof-item:hover { opacity: 0.75; }
+    .proof-stars { color: #FFD700; font-size: 1rem; letter-spacing: 2px; }
+    .proof-text { font-size: 0.88rem; color: #aaa; line-height: 1.4; }
+    .proof-text strong { color: #fff; font-size: 0.95rem; }
+    .proof-divider { width: 1px; height: 32px; background: #2a2a2a; flex-shrink: 0; }
+    .proof-ig-icon { font-size: 1.3rem; color: #e1306c; }
+    .proof-verified { color: var(--yellow); font-weight: 700; font-size: 0.78rem; margin-left: 4px; }
+    @media (max-width: 500px) {
+      .proof-divider { display: none; }
+      .proof-bar-inner { gap: 16px; }
+    }
+
     /* ── SECTION BASE ── */
     section { padding: 80px 24px; }
     .container { max-width: 900px; margin: 0 auto; }
@@ -573,6 +607,21 @@
     </div>
   </div>
 </section>
+
+<!-- PROOF BAR -->
+<div class="proof-bar">
+  <div class="proof-bar-inner">
+    <a href="https://share.google/ZMfzszKDq3KfiCNAz" target="_blank" rel="noopener noreferrer" class="proof-item">
+      <span class="proof-stars">★★★★★</span>
+      <span class="proof-text"><strong>5,0 no Google</strong><br>646 avaliações verificadas</span>
+    </a>
+    <div class="proof-divider"></div>
+    <a href="https://instagram.com/fabriciomourateam" target="_blank" rel="noopener noreferrer" class="proof-item">
+      <i class="fa-brands fa-instagram proof-ig-icon"></i>
+      <span class="proof-text"><strong>85,4 mil seguidores<span class="proof-verified">✓</span></strong><br>@fabriciomourateam</span>
+    </a>
+  </div>
+</div>
 
 <!-- PAIN -->
 <section class="pain">
