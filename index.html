@@ -182,6 +182,33 @@
   .task-instr table { width:100%; border-collapse:collapse; font-size:11px; margin:6px 0; }
   .task-instr th { background:var(--surface3); color:var(--yellow); padding:5px 8px; text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:0.05em; }
   .task-instr td { padding:6px 8px; border-bottom:1px solid var(--border); color:#ccc; }
+
+  /* ROTEIROS */
+  .reels-progress { display:flex; align-items:center; gap:16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 20px; margin-bottom:16px; }
+  .reels-prog-num { font-size:28px; font-weight:900; color:var(--yellow); line-height:1; }
+  .reels-prog-label { font-size:11px; color:var(--text-dim); margin-top:2px; }
+  .reels-prog-track { flex:1; height:8px; background:var(--surface3); border-radius:4px; overflow:hidden; }
+  .reels-prog-fill { height:100%; background:linear-gradient(90deg,var(--green),#86efac); border-radius:4px; transition:width 0.4s; }
+  .reel-section-header { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; margin:20px 0 10px; display:flex; align-items:center; gap:10px; }
+  .reel-section-header::after { content:''; flex:1; height:1px; background:var(--border); }
+  .reel-topo { color:#93c5fd; }
+  .reel-meio { color:var(--yellow-dim); }
+  .reel-fundo { color:#fca5a5; }
+  .reel-card { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:7px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; transition:border-color 0.15s; user-select:none; }
+  .reel-card:hover { border-color:rgba(245,197,24,0.25); }
+  .reel-card.gravado { opacity:0.42; }
+  .reel-card.gravado .reel-title { text-decoration:line-through; color:var(--text-dim); }
+  .reel-num { font-size:20px; font-weight:900; color:var(--yellow); width:28px; flex-shrink:0; line-height:1.1; text-align:center; }
+  .reel-card.gravado .reel-num { color:var(--text-muted); }
+  .reel-body { flex:1; min-width:0; }
+  .reel-title { font-size:12px; font-weight:700; margin-bottom:8px; }
+  .reel-row { margin-bottom:5px; }
+  .reel-lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); }
+  .reel-txt { font-size:11px; color:#bbb; line-height:1.55; }
+  .reel-cta-txt { font-size:11px; color:var(--yellow); font-style:italic; }
+  .reel-check { width:20px; height:20px; border:2px solid var(--text-muted); border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.15s; margin-top:1px; }
+  .reel-check.checked { background:var(--green); border-color:var(--green); }
+  .reel-check.checked::after { content:'✓'; font-size:11px; font-weight:900; color:#000; line-height:1; }
 </style>
 </head>
 <body>
@@ -206,6 +233,7 @@
   <div class="tab" onclick="showTab('fase3')">Fase 3 — Monetizacao</div>
   <div class="tab" onclick="showTab('google')">Google Ads</div>
   <div class="tab" onclick="showTab('calendario')">Calendario</div>
+  <div class="tab" onclick="showTab('roteiros')">Roteiros</div>
 </div>
 
 <!-- ===== VISÃO GERAL ===== -->
@@ -532,6 +560,22 @@
   <div class="card">
     <div class="card-title">Calendario Editorial — 30 Dias</div>
     <div id="cal-grid"></div>
+  </div>
+</div>
+
+<!-- ===== ROTEIROS ===== -->
+<div class="section" id="tab-roteiros">
+  <div class="reels-progress">
+    <div><div class="reels-prog-num" id="reelsDone">0</div><div class="reels-prog-label">de 30 gravados</div></div>
+    <div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;"><span style="color:var(--text-dim);">Progresso</span><span id="reelsPct" style="color:var(--green);font-weight:700;">0%</span></div><div class="reels-prog-track"><div class="reels-prog-fill" id="reelsFill" style="width:0%"></div></div></div>
+  </div>
+  <div class="card">
+    <div class="reel-section-header reel-topo">🔵 Topo de Funil — 15 Reels</div>
+    <div id="reels-topo"></div>
+    <div class="reel-section-header reel-meio" style="margin-top:8px;">🟡 Meio de Funil — 10 Reels</div>
+    <div id="reels-meio"></div>
+    <div class="reel-section-header reel-fundo" style="margin-top:8px;">🟢 Fundo de Funil — 5 Reels</div>
+    <div id="reels-fundo"></div>
   </div>
 </div>
 
@@ -919,6 +963,77 @@ function renderCalendar() {
   });
 }
 
+// ===== ROTEIROS =====
+const REELS = [
+  { id:'r1',  num:1,  funil:'topo', titulo:'TRT — 3 erros fatais', gancho:'Se você tem menos de 40 anos e sente cansaço, libido baixa, perda de força — pode ser testosterona baixa. Mas presta atenção nos 3 erros antes de pensar em TRT.', dev:'Erro 1: começar sem exame completo. Erro 2: dose baseada em vídeo de internet. Erro 3: não monitorar estradiol e hematócrito. Caso real de aluno.', cta:'Comenta TRT na DM que eu te mando o protocolo de exames' },
+  { id:'r2',  num:2,  funil:'topo', titulo:'Carbo no cutting', gancho:'Se você ainda corta carboidrato pra perder gordura, presta atenção nos próximos 30 segundos.', dev:'O problema não é o carbo, é o déficit mal calculado. Exemplo de aluno que voltou a comer arroz e perdeu mais gordura.', cta:'Salva esse vídeo e me manda CARBO na DM' },
+  { id:'r3',  num:3,  funil:'topo', titulo:'Mounjaro — o real', gancho:'Mounjaro não faz milagre — e eu vou te provar com dados.', dev:'Sem treino + dieta, a pessoa perde 40% de músculo. Dado real.', cta:'Comenta MOUNJARO que eu te mando o protocolo certo' },
+  { id:'r4',  num:4,  funil:'topo', titulo:'Pele flácida', gancho:'Perdeu peso e ficou com pele flácida? A ciência explica por quê.', dev:'Velocidade do emagrecimento + síntese de colágeno + papel do músculo.', cta:'Salva esse vídeo' },
+  { id:'r5',  num:5,  funil:'topo', titulo:'Peptídeos', gancho:'GHK-Cu, BPC-157, TB-500: o que ninguém te explica sobre peptídeos.', dev:'O que é cada um + quando faz sentido + risco de comprar errado.', cta:'Manda PEPT na DM' },
+  { id:'r6',  num:6,  funil:'topo', titulo:'Pesagem diária', gancho:'Se você se pesa todo dia, está enxergando errado.', dev:'Variação de água + ciclo hormonal + como medir progresso de verdade.', cta:'Comenta PESO pra eu te mandar minha planilha' },
+  { id:'r7',  num:7,  funil:'topo', titulo:'Suplementação 85% lixo', gancho:'85% dos suplementos que você toma são dinheiro jogado fora.', dev:'Os 3 que funcionam (creatina, proteína, cafeína). Os que não fazem nada.', cta:'Comenta SUPLE pra lista completa' },
+  { id:'r8',  num:8,  funil:'topo', titulo:'Mulher hormonizada', gancho:'73% das musas fitness usam manipulados e não te contam.', dev:'Por que isso importa pra mulher natural que se compara.', cta:'Compartilha com uma amiga' },
+  { id:'r9',  num:9,  funil:'topo', titulo:'Sono e ganho de músculo', gancho:'Você dorme menos de 7h e quer ganhar músculo? Esqueça.', dev:'GH, testosterona, recuperação + caso de aluno que só ajustou sono.', cta:'Salva e me manda foto do seu sono semanal' },
+  { id:'r10', num:10, funil:'topo', titulo:'Oxandrolona', gancho:'Oxandrolona: a droga "estética" que pode destruir sua fertilidade.', dev:'3 erros clássicos + o que avaliar antes.', cta:'Salva esse vídeo' },
+  { id:'r11', num:11, funil:'topo', titulo:'Volume vs Intensidade', gancho:'Você faz 4 séries de 12 repetições? Está perdendo tempo.', dev:'Volume vs. intensidade + repetições próximas à falha.', cta:'Salva e treina assim na próxima' },
+  { id:'r12', num:12, funil:'topo', titulo:'Natural vs Hormonizado', gancho:'Para de comparar seu shape com quem não joga no mesmo campo.', dev:'Diferença real de evolução natural vs. usuário + por que isso destrói autoestima.', cta:'Manda pra um amigo que precisa ouvir isso' },
+  { id:'r13', num:13, funil:'topo', titulo:'Refeição livre', gancho:'Por que sua dieta funciona na semana e falha no fim de semana.', dev:'Lógica do déficit semanal + como estruturar refeição livre.', cta:'Comenta LIVRE' },
+  { id:'r14', num:14, funil:'topo', titulo:'Treino feminino com peso', gancho:'Mulher que treina pesado fica masculina? Eu vou te mostrar a verdade.', dev:'Diferença hormonal + por que mulher precisa de mais carga.', cta:'Manda pra uma amiga que tem medo de pegar peso' },
+  { id:'r15', num:15, funil:'topo', titulo:'Testosterona baixa', gancho:'Você tem menos de 40 anos e já sente isso? Pode ser testosterona baixa.', dev:'5 sintomas + exame que precisa fazer + o que NÃO é (cansaço ≠ TRT automático).', cta:'Salva pra fazer o exame na próxima semana' },
+  { id:'r16', num:16, funil:'meio', titulo:'Caso clínico narrado', gancho:'Aluno chegou com 28% de gordura e zero motivação. Em 6 meses, virou isso aqui.', dev:'Narrar processo — onde estava, o que mudou, ponto de virada.', cta:'Quer um diagnóstico do seu caso? Link na bio' },
+  { id:'r17', num:17, funil:'meio', titulo:'Como funciona a consultoria', gancho:'Como funciona uma consultoria comigo, sem enrolação.', dev:'Mostrar os 4 passos do método em 60s.', cta:'Se faz sentido pra você, fala comigo no link da bio' },
+  { id:'r18', num:18, funil:'meio', titulo:'Painel de acompanhamento', gancho:'Esse é meu painel de acompanhamento de aluno. Vou abrir pra você.', dev:'Mostrar tela com dados borrados — como decide cada ajuste.', cta:'Compartilha com quem acha que consultoria é só PDF' },
+  { id:'r19', num:19, funil:'meio', titulo:'Diferencial', gancho:'O que me diferencia dos 99% dos consultores que você segue.', dev:'Sua formação + experiência + visão hormonal + acompanhamento próximo.', cta:'Manda CONSULTORIA pra entender' },
+  { id:'r20', num:20, funil:'meio', titulo:'Erro próprio que mudou o método', gancho:'Eu errei o protocolo de um aluno em 2023. E foi o erro que mudou meu método.', dev:'Conta a história + lição aprendida + por que isso te tornou melhor.', cta:'Me segue pra esse tipo de honestidade' },
+  { id:'r21', num:21, funil:'meio', titulo:'Exames antes do TRT', gancho:'Os 5 exames que você precisa fazer antes de pensar em TRT.', dev:'Hemograma, testosterona total/livre, estradiol, prolactina, SHBG.', cta:'Salva esse vídeo, vai precisar' },
+  { id:'r22', num:22, funil:'meio', titulo:'Tour 7 países', gancho:'Já transformei físicos em 7 países. Esses são os países e o que aprendi.', dev:'EUA, Portugal, Brasil, Suíça, etc. + diferença cultural na alimentação.', cta:'Brasileiro fora do Brasil? Link na bio' },
+  { id:'r23', num:23, funil:'meio', titulo:'Quebra objeção — tempo', gancho:'Não tem tempo pra treinar? 3x40min por semana são suficientes.', dev:'Protocolo minimalista de hipertrofia + caso de aluno executivo.', cta:'Comenta TEMPO' },
+  { id:'r24', num:24, funil:'meio', titulo:'FAQ em vídeo', gancho:'As 5 perguntas que mais recebo sobre consultoria.', dev:'Como funciona, quanto custa, garante resultado, atende quem usa hormônio, prazo.', cta:'Outras dúvidas? Link na bio' },
+  { id:'r25', num:25, funil:'meio', titulo:'Depoimento de aluno', gancho:'Vou deixar o próprio aluno contar.', dev:'Depoimento real de 45–60s + foto antes/depois.', cta:'Quer ser o próximo? Link na bio' },
+  { id:'r26', num:26, funil:'fundo', titulo:'Abertura de vagas', gancho:'Abri 20 vagas pra consultoria essa semana. Lê isso antes de querer entrar.', dev:'Pra quem é + pra quem não é + como funciona + garantia.', cta:'Link na bio. Vagas até sexta' },
+  { id:'r27', num:27, funil:'fundo', titulo:'Última chamada', gancho:'Última chamada: 5 vagas restantes pra esse mês.', dev:'Reforço da garantia + último depoimento.', cta:'Corre — link na bio' },
+  { id:'r28', num:28, funil:'fundo', titulo:'Quebra objeção — solo', gancho:'Você vai tentar sozinho de novo? Vou te contar o que vai acontecer.', dev:'Mostra o ciclo tentativa-falha + custo emocional + ROI da consultoria.', cta:'Para de tentar. Link na bio' },
+  { id:'r29', num:29, funil:'fundo', titulo:'Garantia explícita', gancho:'Eu sou o único consultor que devolve seu dinheiro se não tiver resultado.', dev:'Explica os termos da garantia + por que tem coragem de oferecer.', cta:'Garantia + resultado = link na bio' },
+  { id:'r30', num:30, funil:'fundo', titulo:'CTA puro à câmera', gancho:'Se você chegou até aqui no meu perfil e ainda não falou comigo, tá perdendo tempo.', dev:'Você falando direto à câmera — sem efeito, sem corte. Autoridade pura.', cta:'Manda mensagem agora' },
+];
+
+function renderReels() {
+  const containers = { topo: document.getElementById('reels-topo'), meio: document.getElementById('reels-meio'), fundo: document.getElementById('reels-fundo') };
+  REELS.forEach(r => {
+    const gravado = isDone(r.id);
+    const div = document.createElement('div');
+    div.className = 'reel-card' + (gravado ? ' gravado' : '');
+    div.innerHTML = `
+      <div class="reel-num">${r.num}</div>
+      <div class="reel-body">
+        <div class="reel-title">${r.titulo}</div>
+        <div class="reel-row"><div class="reel-lbl">Gancho</div><div class="reel-txt">"${r.gancho}"</div></div>
+        <div class="reel-row"><div class="reel-lbl">Desenvolvimento</div><div class="reel-txt">${r.dev}</div></div>
+        <div class="reel-row"><div class="reel-lbl">CTA</div><div class="reel-cta-txt">"${r.cta}"</div></div>
+      </div>
+      <div class="reel-check${gravado ? ' checked' : ''}"></div>
+    `;
+    div.addEventListener('click', async () => {
+      const novo = !isDone(r.id);
+      div.classList.toggle('gravado', novo);
+      div.querySelector('.reel-check').classList.toggle('checked', novo);
+      await saveTask(r.id, novo);
+      updateReelsProgress();
+      showToast();
+    });
+    containers[r.funil].appendChild(div);
+  });
+  updateReelsProgress();
+}
+
+function updateReelsProgress() {
+  const done = REELS.filter(r => isDone(r.id)).length;
+  const pct = Math.round(done / 30 * 100);
+  document.getElementById('reelsDone').textContent = done;
+  document.getElementById('reelsPct').textContent = pct + '%';
+  document.getElementById('reelsFill').style.width = pct + '%';
+}
+
 // ===== TOAST =====
 let toastTimer;
 function showToast() {
@@ -959,6 +1074,7 @@ async function init() {
   });
   renderTasks('tasks-google', GOOGLE_TASKS);
   renderCalendar();
+  renderReels();
   updateProgress();
 }
 
