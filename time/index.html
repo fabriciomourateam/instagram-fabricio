@@ -657,13 +657,19 @@
 
     /* ── MOBILE FIXES ── */
     @media (max-width: 768px) {
-      /* Hero: remove centering vertical e espaço enorme */
+      /* Evita overflow horizontal em qualquer elemento */
+      html { overflow-x: hidden; }
+
+      /* Hero: sem espaço vazio, conteúdo do topo */
       .hero {
         min-height: 0 !important;
         justify-content: flex-start !important;
         padding: 72px 20px 48px !important;
       }
-      /* Stats: forçar grid 2 colunas */
+      /* Hero content: ocupa largura total */
+      .hero-content { width: 100%; }
+
+      /* Stats: grid 2 colunas */
       .hero-stats {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
@@ -671,6 +677,14 @@
         margin-top: 24px !important;
       }
       .hero-stat { flex: none !important; }
+
+      /* Deliverables: 1 coluna no mobile — minmax(260px) transbordava */
+      .del-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+      .del-item { padding: 14px 16px !important; }
+      .del-text { font-size: 0.9rem !important; }
 
       /* Centralização de seções */
       .section-tag { text-align: center; display: block; }
