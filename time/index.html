@@ -106,7 +106,7 @@
         linear-gradient(to right, rgba(8,8,8,0.05) 0%, rgba(8,8,8,0.5) 55%, rgba(8,8,8,0.88) 100%);
     }
     @media (max-width: 768px) {
-      .hero::before { background-position: center 20%; opacity: 0.10; }
+      .hero::before { display: none; }
       .hero::after {
         background: linear-gradient(to bottom, rgba(8,8,8,0.65) 0%, rgba(8,8,8,0.90) 50%, rgba(8,8,8,0.98) 100%);
       }
@@ -655,8 +655,24 @@
     .btn-final { animation: pulse-yellow 3s ease-in-out infinite; }
     .btn-wpp-sm { animation: pulse-yellow 3s ease-in-out infinite; }
 
-    /* ── MOBILE CENTERING FIXES ── */
+    /* ── MOBILE FIXES ── */
     @media (max-width: 768px) {
+      /* Hero: remove centering vertical e espaço enorme */
+      .hero {
+        min-height: 0 !important;
+        justify-content: flex-start !important;
+        padding: 72px 20px 48px !important;
+      }
+      /* Stats: forçar grid 2 colunas */
+      .hero-stats {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        margin-top: 24px !important;
+      }
+      .hero-stat { flex: none !important; }
+
+      /* Centralização de seções */
       .section-tag { text-align: center; display: block; }
       .pain-intro, .del-intro, .results-intro { text-align: center; margin-left: auto; margin-right: auto; }
       .pain .container h2,
