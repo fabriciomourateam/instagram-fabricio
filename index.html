@@ -122,8 +122,11 @@
   .cpa-bad { color:var(--red); font-weight:700; }
 
   /* CALENDAR */
-  .cal-item { display:grid; grid-template-columns:28px 90px 70px 55px 1fr; gap:8px; align-items:center; padding:9px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:7px; margin-bottom:5px; }
+  .cal-item { display:flex; flex-direction:column; padding:10px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:7px; margin-bottom:5px; cursor:pointer; user-select:none; transition:border-color 0.15s; }
+  .cal-item:hover { border-color:rgba(245,197,24,0.25); }
   .cal-item.today { border-color:var(--yellow-border); background:var(--yellow-bg); }
+  .cal-item.expanded { border-color:var(--yellow-border); }
+  .cal-header { display:grid; grid-template-columns:28px 90px 70px 55px 1fr; gap:8px; align-items:center; }
   .cal-num { font-size:15px; font-weight:800; color:var(--yellow); text-align:center; }
   .cal-pilar { font-size:10px; font-weight:600; }
   .cal-titulo { font-size:12px; font-weight:600; }
@@ -133,7 +136,13 @@
   .fn-topo { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; background:rgba(34,197,94,0.12); color:#86efac; }
   .fn-meio { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; background:rgba(245,197,24,0.12); color:var(--yellow-dim); }
   .fn-fundo { font-size:10px; padding:2px 7px; border-radius:8px; font-weight:600; background:rgba(239,68,68,0.12); color:#fca5a5; }
-  @media(max-width:600px) { .cal-item { grid-template-columns:24px 1fr 55px; } .cal-pilar,.cal-cta { display:none; } }
+  .cal-script { display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+  .cal-item.expanded .cal-script { display:block; }
+  .cal-script-row { margin-bottom:6px; }
+  .cal-script-lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); margin-bottom:2px; }
+  .cal-script-txt { font-size:11px; color:#bbb; line-height:1.6; }
+  .cal-script-cta { font-size:11px; color:var(--yellow); font-style:italic; }
+  @media(max-width:600px) { .cal-header { grid-template-columns:24px 1fr 55px; } .cal-pilar,.cal-cta { display:none; } }
 
   /* ALERTS */
   .alert-item { display:flex; gap:10px; padding:11px 13px; border-radius:8px; border-left:3px solid; margin-bottom:6px; }
@@ -233,7 +242,6 @@
   <div class="tab" onclick="showTab('fase3')">Fase 3 — Monetizacao</div>
   <div class="tab" onclick="showTab('google')">Google Ads</div>
   <div class="tab" onclick="showTab('calendario')">Calendario</div>
-  <div class="tab" onclick="showTab('roteiros')">Roteiros</div>
 </div>
 
 <!-- ===== VISÃO GERAL ===== -->
@@ -563,22 +571,6 @@
   </div>
 </div>
 
-<!-- ===== ROTEIROS ===== -->
-<div class="section" id="tab-roteiros">
-  <div class="reels-progress">
-    <div><div class="reels-prog-num" id="reelsDone">0</div><div class="reels-prog-label">de 30 gravados</div></div>
-    <div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;"><span style="color:var(--text-dim);">Progresso</span><span id="reelsPct" style="color:var(--green);font-weight:700;">0%</span></div><div class="reels-prog-track"><div class="reels-prog-fill" id="reelsFill" style="width:0%"></div></div></div>
-  </div>
-  <div class="card">
-    <div class="reel-section-header reel-topo">🔵 Topo de Funil — 15 Reels</div>
-    <div id="reels-topo"></div>
-    <div class="reel-section-header reel-meio" style="margin-top:8px;">🟡 Meio de Funil — 10 Reels</div>
-    <div id="reels-meio"></div>
-    <div class="reel-section-header reel-fundo" style="margin-top:8px;">🟢 Fundo de Funil — 5 Reels</div>
-    <div id="reels-fundo"></div>
-  </div>
-</div>
-
 <footer>Dashboard — <span>@fabriciomourateam</span> &nbsp;|&nbsp; Fase 1: Fundacao (Dias 1-30) &nbsp;|&nbsp; Progresso salvo no navegador</footer>
 
 <script>
@@ -700,36 +692,36 @@ const GOOGLE_TASKS = [
 ];
 
 const CALENDARIO = [
-  { dia:1, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'TRT — 3 erros fatais', cta:'Comenta TRT', today:true },
-  { dia:2, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Carbo no cutting', cta:'Comenta CARBO' },
-  { dia:3, pilar:'Prova social', formato:'Carrossel', funil:'Meio', titulo:'Caso aluno — 6 meses', cta:'Link na bio' },
-  { dia:4, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'Como funciona consultoria', cta:'Link na bio' },
-  { dia:5, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Mounjaro — o real', cta:'Comenta MOUNJARO' },
-  { dia:6, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'Garantia explicita', cta:'Link na bio' },
-  { dia:7, pilar:'Recomposicao', formato:'Carrossel', funil:'Topo', titulo:'Pele flacida', cta:'Salva' },
-  { dia:8, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'Painel acompanhamento', cta:'Compartilha' },
-  { dia:9, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Peptideos GHK BPC', cta:'Comenta PEPT' },
-  { dia:10, pilar:'Prova social', formato:'Reel', funil:'Meio', titulo:'Depoimento aluno', cta:'Link na bio' },
-  { dia:11, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Pesagem diaria', cta:'Comenta PESO' },
-  { dia:12, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'Quebra objecao preco', cta:'Link na bio' },
-  { dia:13, pilar:'Hormonios', formato:'Carrossel', funil:'Meio', titulo:'Oxandrolona guia', cta:'Salva' },
-  { dia:14, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'Diferencial', cta:'Comenta CONSULTORIA' },
-  { dia:15, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Suplementacao 85% lixo', cta:'Comenta SUPLE' },
-  { dia:16, pilar:'Prova social', formato:'Reel', funil:'Meio', titulo:'Tour 7 paises', cta:'Link na bio' },
-  { dia:17, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Mulher hormonizada 73%', cta:'Compartilha' },
-  { dia:18, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'Abertura de vagas', cta:'Link na bio' },
-  { dia:19, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Sono e ganho de musculo', cta:'Salva' },
-  { dia:20, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'Erro proprio que mudou metodo', cta:'Me segue' },
-  { dia:21, pilar:'Hormonios', formato:'Carrossel', funil:'Meio', titulo:'Exames antes do TRT', cta:'Salva' },
-  { dia:22, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Volume vs Intensidade', cta:'Salva' },
-  { dia:23, pilar:'Prova social', formato:'Carrossel', funil:'Meio', titulo:'Antes/depois feminino', cta:'Link na bio' },
-  { dia:24, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'Ultima chamada 5 vagas', cta:'Link na bio' },
-  { dia:25, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Natural vs Hormonizado', cta:'Compartilha' },
-  { dia:26, pilar:'Autoridade', formato:'Reel', funil:'Meio', titulo:'FAQ em video', cta:'Link na bio' },
-  { dia:27, pilar:'Recomposicao', formato:'Reel', funil:'Topo', titulo:'Refeicao livre fim de semana', cta:'Comenta LIVRE' },
-  { dia:28, pilar:'Hormonios', formato:'Reel', funil:'Topo', titulo:'Mulher com peso pesado', cta:'Compartilha' },
-  { dia:29, pilar:'Conversao', formato:'Reel', funil:'Fundo', titulo:'CTA puro a camera', cta:'Manda mensagem' },
-  { dia:30, pilar:'Prova social', formato:'Reel', funil:'Meio', titulo:'Caso clinico 14kg', cta:'Link na bio' },
+  { dia:1,  pilar:'Hormonios',   formato:'Reel',     funil:'Topo',  titulo:'TRT — 3 erros fatais',          cta:'Comenta TRT',         today:true, reel:'r1'  },
+  { dia:2,  pilar:'Recomposicao',formato:'Reel',     funil:'Topo',  titulo:'Carbo no cutting',               cta:'Comenta CARBO',                   reel:'r2'  },
+  { dia:3,  pilar:'Prova social', formato:'Carrossel',funil:'Meio',  titulo:'Caso aluno — 6 meses',           cta:'Link na bio',                     reel:'r16' },
+  { dia:4,  pilar:'Autoridade',  formato:'Reel',     funil:'Meio',  titulo:'Como funciona consultoria',      cta:'Link na bio',                     reel:'r17' },
+  { dia:5,  pilar:'Hormonios',   formato:'Reel',     funil:'Topo',  titulo:'Mounjaro — o real',              cta:'Comenta MOUNJARO',                reel:'r3'  },
+  { dia:6,  pilar:'Conversao',   formato:'Reel',     funil:'Fundo', titulo:'Garantia explicita',             cta:'Link na bio',                     reel:'r29' },
+  { dia:7,  pilar:'Recomposicao',formato:'Carrossel',funil:'Topo',  titulo:'Pele flacida',                   cta:'Salva',                           reel:'r4'  },
+  { dia:8,  pilar:'Autoridade',  formato:'Reel',     funil:'Meio',  titulo:'Painel acompanhamento',          cta:'Compartilha',                     reel:'r18' },
+  { dia:9,  pilar:'Hormonios',   formato:'Reel',     funil:'Topo',  titulo:'Peptideos GHK BPC',              cta:'Comenta PEPT',                    reel:'r5'  },
+  { dia:10, pilar:'Prova social', formato:'Reel',     funil:'Meio',  titulo:'Depoimento aluno',               cta:'Link na bio',                     reel:'r25' },
+  { dia:11, pilar:'Recomposicao',formato:'Reel',     funil:'Topo',  titulo:'Pesagem diaria',                 cta:'Comenta PESO',                    reel:'r6'  },
+  { dia:12, pilar:'Conversao',   formato:'Reel',     funil:'Fundo', titulo:'Quebra objecao preco',           cta:'Link na bio',                     reel:'r28' },
+  { dia:13, pilar:'Hormonios',   formato:'Carrossel',funil:'Meio',  titulo:'Oxandrolona guia',               cta:'Salva',                           reel:'r10' },
+  { dia:14, pilar:'Autoridade',  formato:'Reel',     funil:'Meio',  titulo:'Diferencial',                    cta:'Comenta CONSULTORIA',             reel:'r19' },
+  { dia:15, pilar:'Recomposicao',formato:'Reel',     funil:'Topo',  titulo:'Suplementacao 85% lixo',         cta:'Comenta SUPLE',                   reel:'r7'  },
+  { dia:16, pilar:'Prova social', formato:'Reel',     funil:'Meio',  titulo:'Tour 7 paises',                  cta:'Link na bio',                     reel:'r22' },
+  { dia:17, pilar:'Hormonios',   formato:'Reel',     funil:'Topo',  titulo:'Mulher hormonizada 73%',         cta:'Compartilha',                     reel:'r8'  },
+  { dia:18, pilar:'Conversao',   formato:'Reel',     funil:'Fundo', titulo:'Abertura de vagas',              cta:'Link na bio',                     reel:'r26' },
+  { dia:19, pilar:'Recomposicao',formato:'Reel',     funil:'Topo',  titulo:'Sono e ganho de musculo',        cta:'Salva',                           reel:'r9'  },
+  { dia:20, pilar:'Autoridade',  formato:'Reel',     funil:'Meio',  titulo:'Erro proprio que mudou metodo',  cta:'Me segue',                        reel:'r20' },
+  { dia:21, pilar:'Hormonios',   formato:'Carrossel',funil:'Meio',  titulo:'Exames antes do TRT',            cta:'Salva',                           reel:'r21' },
+  { dia:22, pilar:'Recomposicao',formato:'Reel',     funil:'Topo',  titulo:'Volume vs Intensidade',          cta:'Salva',                           reel:'r11' },
+  { dia:23, pilar:'Prova social', formato:'Carrossel',funil:'Meio',  titulo:'Antes/depois feminino',          cta:'Link na bio',                     reel:'r25' },
+  { dia:24, pilar:'Conversao',   formato:'Reel',     funil:'Fundo', titulo:'Ultima chamada 5 vagas',         cta:'Link na bio',                     reel:'r27' },
+  { dia:25, pilar:'Hormonios',   formato:'Reel',     funil:'Topo',  titulo:'Natural vs Hormonizado',         cta:'Compartilha',                     reel:'r12' },
+  { dia:26, pilar:'Autoridade',  formato:'Reel',     funil:'Meio',  titulo:'FAQ em video',                   cta:'Link na bio',                     reel:'r24' },
+  { dia:27, pilar:'Recomposicao',formato:'Reel',     funil:'Topo',  titulo:'Refeicao livre fim de semana',   cta:'Comenta LIVRE',                   reel:'r13' },
+  { dia:28, pilar:'Hormonios',   formato:'Reel',     funil:'Topo',  titulo:'Mulher com peso pesado',         cta:'Compartilha',                     reel:'r14' },
+  { dia:29, pilar:'Conversao',   formato:'Reel',     funil:'Fundo', titulo:'CTA puro a camera',              cta:'Manda mensagem',                  reel:'r30' },
+  { dia:30, pilar:'Prova social', formato:'Reel',     funil:'Meio',  titulo:'Caso clinico 14kg',              cta:'Link na bio',                     reel:'r16' },
 ];
 
 // ===== INSTRUCTIONS =====
@@ -949,16 +941,28 @@ function renderCalendar() {
   const funilClass = { Topo:'fn-topo', Meio:'fn-meio', Fundo:'fn-fundo' };
   const formatClass = { Reel:'fmt-reel', Carrossel:'fmt-carr' };
   const pilarColor = { Hormonios:'#86efac', Recomposicao:'#93c5fd', 'Prova social':'#fca5a5', Autoridade:'#fde68a', Conversao:'#c4b5fd' };
+  const reelMap = {};
+  REELS.forEach(r => { reelMap[r.id] = r; });
+
   CALENDARIO.forEach(d => {
+    const r = d.reel ? reelMap[d.reel] : null;
     const div = document.createElement('div');
     div.className = 'cal-item' + (d.today ? ' today' : '');
     div.innerHTML = `
-      <div class="cal-num">${d.dia}</div>
-      <div class="cal-pilar" style="color:${pilarColor[d.pilar]||'#fff'}">${d.pilar}</div>
-      <span class="${formatClass[d.formato]||'fmt-reel'}">${d.formato}</span>
-      <span class="${funilClass[d.funil]||'fn-topo'}">${d.funil}</span>
-      <div><div class="cal-titulo">${d.titulo}</div><div class="cal-cta">CTA: ${d.cta}</div></div>
+      <div class="cal-header">
+        <div class="cal-num">${d.dia}</div>
+        <div class="cal-pilar" style="color:${pilarColor[d.pilar]||'#fff'}">${d.pilar}</div>
+        <span class="${formatClass[d.formato]||'fmt-reel'}">${d.formato}</span>
+        <span class="${funilClass[d.funil]||'fn-topo'}">${d.funil}</span>
+        <div><div class="cal-titulo">${d.titulo}</div><div class="cal-cta">CTA: ${d.cta}</div></div>
+      </div>
+      ${r ? `<div class="cal-script">
+        <div class="cal-script-row"><div class="cal-script-lbl">Gancho</div><div class="cal-script-txt">"${r.gancho}"</div></div>
+        <div class="cal-script-row" style="margin-top:6px"><div class="cal-script-lbl">Desenvolvimento</div><div class="cal-script-txt">${r.dev}</div></div>
+        <div class="cal-script-row" style="margin-top:6px"><div class="cal-script-lbl">CTA</div><div class="cal-script-cta">"${r.cta}"</div></div>
+      </div>` : ''}
     `;
+    if (r) div.addEventListener('click', () => div.classList.toggle('expanded'));
     grid.appendChild(div);
   });
 }
@@ -1074,7 +1078,6 @@ async function init() {
   });
   renderTasks('tasks-google', GOOGLE_TASKS);
   renderCalendar();
-  renderReels();
   updateProgress();
 }
 
