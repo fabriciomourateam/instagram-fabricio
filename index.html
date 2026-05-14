@@ -163,6 +163,25 @@
   /* SAVE TOAST */
   .toast { position:fixed; bottom:20px; right:20px; background:var(--surface); border:1px solid var(--yellow-border); color:var(--yellow); font-size:12px; font-weight:600; padding:8px 16px; border-radius:8px; opacity:0; transition:opacity 0.3s; pointer-events:none; z-index:999; }
   .toast.show { opacity:1; }
+
+  /* TASK INSTRUCTIONS (expandable) */
+  .task-item { cursor:default; }
+  .task-item .task-check { cursor:pointer; }
+  .task-expand { font-size:9px; color:var(--text-muted); flex-shrink:0; transition:transform 0.15s; cursor:pointer; padding:3px 5px; margin-left:auto; user-select:none; }
+  .task-item.expanded .task-expand { transform:rotate(180deg); }
+  .task-instr { display:none; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+  .task-item.expanded .task-instr { display:block; }
+  .task-instr h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--yellow); margin:10px 0 5px; }
+  .task-instr h4:first-child { margin-top:0; }
+  .task-instr p { font-size:11px; color:#bbb; margin-bottom:5px; line-height:1.65; }
+  .task-instr ul, .task-instr ol { padding-left:16px; margin-bottom:6px; }
+  .task-instr li { font-size:11px; color:#bbb; margin-bottom:3px; line-height:1.55; }
+  .task-instr strong { color:var(--text); }
+  .task-instr code { display:block; background:#0a0a0a; border:1px solid #252525; border-radius:6px; padding:9px 12px; font-size:10px; color:var(--yellow); font-family:monospace; white-space:pre-wrap; margin:5px 0 8px; }
+  .task-instr .note { background:var(--yellow-bg); border-left:3px solid var(--yellow); padding:7px 10px; border-radius:0 5px 5px 0; font-size:11px; color:#ccc; margin:7px 0; }
+  .task-instr table { width:100%; border-collapse:collapse; font-size:11px; margin:6px 0; }
+  .task-instr th { background:var(--surface3); color:var(--yellow); padding:5px 8px; text-align:left; font-size:9px; text-transform:uppercase; letter-spacing:0.05em; }
+  .task-instr td { padding:6px 8px; border-bottom:1px solid var(--border); color:#ccc; }
 </style>
 </head>
 <body>
@@ -669,6 +688,112 @@ const CALENDARIO = [
   { dia:30, pilar:'Prova social', formato:'Reel', funil:'Meio', titulo:'Caso clinico 14kg', cta:'Link na bio' },
 ];
 
+// ===== INSTRUCTIONS =====
+const INSTRUCTIONS = {
+  'f1s1t1': `<h4>Onde fazer</h4><p>Instagram → Editar perfil → Biografia</p><h4>Cole exatamente isso</h4><code>Consultor de Performance Corporal
+👇 +2.000 físicos transformados em 7 países
+🎯 Método com garantia de resultado
+📩 Vagas abertas 👇</code><h4>Campo Nome</h4><p><strong>Fabricio Moura</strong></p><h4>Campo Site</h4><p>Troca para <strong>fabriciomoura.com/time</strong></p><div class="note">Linha 1 = cargo claro. Linha 2 = prova social. Linha 3 = diferenciador (garantia). Linha 4 = CTA com urgência.</div>`,
+
+  'f1s1t2': `<h4>Equipamento</h4><p>Celular bom resolve (iPhone ou Samsung flagship). Não precisa de fotógrafo.</p><h4>Setup</h4><ul><li><strong>Fundo:</strong> parede branca, cinza ou amarela (#FFC300)</li><li><strong>Iluminação:</strong> janela natural na sua frente (nunca atrás)</li><li><strong>Enquadramento:</strong> ombros pra cima, centralizado</li><li><strong>Expressão:</strong> séria/confiante — sem sorriso forçado</li><li><strong>Roupa:</strong> camisa simples, cor sólida (preto, branco ou amarelo)</li><li>Tira os óculos</li></ul><div class="note">Faz 20–30 fotos variando levemente o ângulo. Escolhe a que transmite mais autoridade.</div>`,
+
+  'f1s1t3': `<h4>Passo 1 — Capas no Canva (30 min)</h4><ol><li>Acessa canva.com → busca "Instagram Highlight Cover"</li><li>Fundo preto, ícone simples em amarelo (#FFC300)</li><li>Cria 4 capas: pessoa (Quem Sou), engrenagem (Método), troféu (Resultados), balão (FAQ)</li></ol><h4>Conteúdo de cada highlight</h4><p><strong>QUEM SOU (8–12 stories):</strong> Foto + apresentação, prova social 7 países, formação/diferencial, história pessoal, caso de aluno, CTA "link na bio".</p><p><strong>MÉTODO (6–8 stories):</strong> "Como funciona em 4 passos" — Diagnóstico → Protocolo → Acompanhamento → Garantia. Último: "Não é PDF. É consultoria individual." + CTA.</p><p><strong>RESULTADOS (10–15 stories):</strong> 1 aluno por story — foto antes/depois, nome, tempo, transformação. Variar perfis. Último: "Quer ser o próximo?" + CTA.</p><p><strong>FAQ (8–10 stories):</strong> "Quanto custa?" R$2k/ano. "Funciona sem hormônio?" Sim, 60% naturais. "Funciona pra mulher?" Sim, 40% feminino. "Fora do Brasil?" Sim, 7 países. "Tempo pra resultado?" 4–8 semanas. "Tem garantia?" Sim, dinheiro de volta.</p><h4>Passo 2 — Publicar</h4><ol><li>Poste as séries de stories</li><li>No perfil → clica em "+" abaixo da bio</li><li>Seleciona os stories → nomeia → adiciona a capa do Canva</li></ol>`,
+
+  'f1s1t4': `<h4>Como pinar</h4><p>Abre o post → três pontinhos (···) → "Fixar no perfil"</p><h4>Quais pinar (nesta ordem)</h4><ol><li><strong>Resultado</strong> — o antes/depois mais impactante que você tem</li><li><strong>Autoridade</strong> — o mais técnico/educativo (hormônios, recomposição, etc.)</li><li><strong>Apresentação</strong> — quem você é e o que faz</li></ol><div class="note">Se não tiver post ideal para alguma categoria, cria um novo antes de pinar.</div>`,
+
+  'f1s1t5': `<h4>O que pedir ao técnico (fabriciomoura.com)</h4><ul><li>Comprimir todas as imagens em WebP</li><li>Ativar lazy loading abaixo da dobra</li><li>Instalar Cloudflare gratuito (CDN)</li><li>Adicionar Schema Markup (Person + Review + FAQ)</li><li>Mover garantia para o hero (selo visual)</li><li>Trocar CTA "AGENDAR" por "QUERO MINHA PRÉ-CONSULTA GRATUITA"</li><li>Adicionar números no hero: +2.000 transformações | 7 países | 15 anos</li></ul><div class="note">Passa o arquivo docs/09-landing-pages.md para o técnico — tem tudo detalhado.</div>`,
+
+  'f1s1t6': `<h4>O que você faz</h4><ol><li>Acessa business.facebook.com</li><li>Vai em Gerenciador de Eventos → Fontes de Dados → Adicionar</li><li>Cria Pixel novo: nome "fabriciomoura.com"</li><li>Copia o ID (número de 15 dígitos)</li><li>Envia o ID para o técnico instalar</li></ol><h4>O técnico instala</h4><ul><li>Código base do Pixel em todas as páginas</li><li>Evento <strong>Lead</strong> no clique do botão CTA principal</li><li>Evento <strong>PageView</strong> automático</li></ul><h4>Como verificar</h4><p>Instala a extensão <strong>"Meta Pixel Helper"</strong> no Chrome → acessa fabriciomoura.com → deve aparecer verde.</p>`,
+
+  'f1s1t7': `<h4>Ação 1 — Adicionar logo (5 min)</h4><p>Gerenciador de anúncios → Ativos → Imagens → Carregar → sobe seu logo em PNG com fundo transparente.</p><h4>Ação 2 — Adicionar imagens (15 min)</h4><p>Cada campanha ativa → Grupos de anúncios → Anúncios responsivos de display → Editar → Adicionar imagens. Sobe 8–10 fotos suas: profissional, treino, consultoria, resultados de alunos.</p><h4>Ação 3 — Snippets estruturados (10 min)</h4><p>Em cada campanha → Extensões → Snippets estruturados. Cabeçalho: "Serviços". Valores: Consultoria Anual, Acompanhamento Semanal, Protocolo Personalizado, Garantia de Resultado, Atendimento Online.</p><h4>Ação 4 — Melhorar anúncios responsivos (20 min)</h4><p>Abre cada anúncio responsivo de pesquisa. Se qualidade = "Ruim": adiciona 3 títulos e 2 descrições diferentes. Títulos: "Consultoria Esportiva com Garantia", "Perca Gordura Ganhando Músculo", "Método Comprovado em 7 Países".</p><h4>Ação 5 — Pausar palavras sem conversão (10 min)</h4><p>Palavras-chave → Filtrar → Conversões = 0 → Período: últimos 30 dias → Custo > R$30 → Pausa todas.</p><h4>Ação 6 — Remover redundantes</h4><p>Identifica palavras-chave que se sobrepõem entre campanhas e pausa as duplicatas da campanha de menor desempenho.</p>`,
+
+  'f1s1t8': `<h4>Novos orçamentos diários</h4><table><tr><th>Campanha</th><th>Hoje</th><th>Novo</th><th>Por quê</th></tr><tr><td>[F.FUNIL] Principal</td><td>R$980</td><td><strong>R$900</strong></td><td>Reduzir levemente</td></tr><tr><td>Fim de semana</td><td>R$800</td><td><strong>R$700</strong></td><td>Reduzir levemente</td></tr><tr><td>[M.FUNIL]</td><td>R$156</td><td><strong>R$350</strong></td><td>CPA 35% melhor — escalar</td></tr><tr><td>Display RMKT</td><td>R$48</td><td><strong>R$80</strong></td><td>Remarketing escala barato</td></tr><tr><td>[Institucional]</td><td>R$23</td><td><strong>R$50</strong></td><td>Crescer com brand search</td></tr></table><div class="note">Verba total permanece igual. Só redistribui para onde o CPA é menor.</div>`,
+
+  'f1s1t9': `<h4>Causas mais comuns no nicho fitness</h4><ul><li>Promessa de resultado específico ("perca 10kg em 30 dias")</li><li>Imagens de antes/depois</li><li>Linguagem sobre hormônios, anabolizantes, emagrecedores</li><li>Palavra "garantia" sem qualificação</li></ul><h4>O que fazer</h4><ol><li>Google Ads → Campanhas → [PMAX] [TESTE] → clica no aviso de política</li><li>Identifica qual asset está marcado como "reprovado"</li><li>Edita removendo a linguagem problemática</li><li>Substitui por: "Método personalizado", "Acompanhamento próximo", "Resultado consistente"</li><li>Envia para revisão (leva 1–3 dias úteis)</li></ol><div class="note">Se não conseguir reativar em 2 dias: cria campanha PMax nova com ativos mais neutros e pausa a antiga.</div>`,
+
+  'f1s2t1': `<h4>Setup</h4><ul><li><strong>Câmera:</strong> Celular vertical 9:16, resolução máxima, tripé ou alguém segurando</li><li><strong>Iluminação:</strong> Janela grande na sua frente (gratuito) ou ring light 26cm (~R$150)</li><li><strong>Fundo:</strong> Parede limpa ou academia com equipamentos visíveis</li><li><strong>Roupa:</strong> Camisa de academia ou polo, cor sólida, sem estampa</li><li><strong>Microfone:</strong> Lapela de celular (~R$50) ou fala perto do celular em ambiente silencioso</li></ul><h4>Estrutura de cada Reel (60s)</h4><code>0–3s   → GANCHO (olhando direto pra câmera)
+3–45s  → DESENVOLVIMENTO (3 pontos principais)
+45–60s → CTA ("comenta X", "salva esse vídeo")</code><h4>Teleprompter</h4><p>Instala o app <strong>"Teleprompter Premium"</strong> → cola o roteiro de docs/05-roteiros-reels.md → posiciona na altura dos olhos.</p><h4>Ordem de gravação</h4><ol><li>Educativos (mais fáceis, só você explicando)</li><li>Autoridade</li><li>Conversão (precisam de mais energia)</li></ol><h4>Checklist antes de cada gravação</h4><ul><li>Celular 100% de bateria</li><li>Notificações silenciadas</li><li>Câmera frontal em 4K</li><li>Roteiro no teleprompter pronto</li><li>Fundo limpo, iluminação testada</li></ul>`,
+
+  'f1s2t2': `<h4>Estrutura do VSL (60s)</h4><code>0–5s:   "Se você [problema], fica aqui."
+5–20s:  Agita a dor — por que tentativas anteriores falharam
+20–40s: Apresenta solução — seu método em 3 pontos
+40–55s: Prova social — +2.000 alunos, 7 países, garantia
+55–60s: CTA — "Clica no botão abaixo"</code><h4>Versão 1 — Emocional</h4><p>"Se você treina há anos e seu corpo travou, presta atenção. O problema não é esforço — é que você não tem um protocolo personalizado. Já ajudei +2.000 pessoas em 7 países com treino, dieta, acompanhamento semanal e suporte hormonal. Com garantia. Clica no botão."</p><h4>Versão 2 — Técnico</h4><p>"A maioria dos consultores te entrega um PDF e some. Aqui é diferente. Diagnóstico completo, protocolo individualizado, ajustes baseados em dados. +2.000 físicos em 7 países. Garantia ou dinheiro de volta."</p><h4>Versão 3 — Direto</h4><p>"Quanto tempo você ainda vai perder tentando sozinho? Método com garantia, 15 anos de consultoria, +2.000 físicos transformados. Clica no botão."</p><div class="note">Grava as 3 versões. O SM testa qual converte mais. Depois coloca no topo da landing /time.</div>`,
+
+  'f1s2t3': `<h4>Pauta da reunião com o SM</h4><p><strong>O problema atual:</strong> 90% do conteúdo é topo de funil (só alcance). Não há conversão.</p><p><strong>Nova distribuição:</strong></p><ul><li><strong>50% Topo:</strong> Reels educativos/virais para atrair seguidores</li><li><strong>33% Meio:</strong> Autoridade e método para nutrir quem já segue</li><li><strong>17% Fundo:</strong> Conversão (abertura de vagas, garantia, objeções)</li></ul><p><strong>CTA obrigatório em todo post:</strong></p><ul><li>Topo: palavra-código na DM ("comenta TRT", "comenta CARBO")</li><li>Meio: "Link na bio" ou "Compartilha"</li><li>Fundo: "Link na bio" ou "Manda mensagem"</li></ul><div class="note">Passa o docs/04-calendario.md para o SM — calendário de 30 dias completo já pronto.</div>`,
+
+  'f1s2t4': `<p>Landing page já está no ar em <strong>instagram-fabricio.vercel.app/time</strong> com todas as seções: hero, prova social, método, deliverables, resultados, sobre, garantia, FAQ e CTA.</p>`,
+
+  'f1s2t5': `<h4>O que pedir ao técnico</h4><ul><li>Criar propriedade GA4 em analytics.google.com</li><li>Instalar tag em fabriciomoura.com e na landing /time</li><li>Configurar evento: clique nos botões CTA (WhatsApp)</li><li>Configurar evento: scroll até 75% da página</li><li>Configurar evento: abertura do FAQ</li><li>Instalar Microsoft Clarity (gratuito) para mapas de calor</li></ul>`,
+
+  'f1s2t6': `<h4>O que é</h4><p>Você sobe sua lista de clientes/leads para o Google Ads. Ele encontra essas pessoas nas buscas e usa como referência para encontrar pessoas parecidas.</p><h4>Passo a passo</h4><ol><li>Exporta sua lista de clientes do WhatsApp/CRM — nome, email, telefone</li><li>Formata em CSV: colunas Email, Phone, First Name, Last Name</li><li>Google Ads → Ferramentas → Gerenciador de públicos → Seus segmentos de dados → + → Lista de clientes</li><li>Sobe o arquivo CSV</li><li>Aplica esse público como "Observação" nas campanhas de pesquisa ativas</li></ol><div class="note">Resultado esperado: CPA cai 15–25% nas campanhas que usam esse público como sinal.</div>`,
+
+  'f1s2t7': `<h4>Diferença do lead Instagram vs Google</h4><p>Leads de Instagram vêm mais frios — te seguem mas não buscaram ativamente. Têm mais objeção de "não sabia que era pago". Precisam de mais aquecimento antes da call.</p><h4>Objeções e como rebater</h4><table><tr><th>Objeção</th><th>Resposta</th></tr><tr><td>"É caro"</td><td>"Dividido em 12x são R$167/mês — menos que 1 mês de suplemento. E com garantia."</td></tr><tr><td>"Vou tentar mais sozinho"</td><td>"Quantas vezes você já tentou? O que vai ser diferente agora?"</td></tr><tr><td>"Não sei se funciona pra mim"</td><td>"Por isso existe o diagnóstico — para ver o que funciona pro seu caso."</td></tr><tr><td>"Só atende quem usa hormônio?"</td><td>"60% dos meus alunos são naturais. O protocolo é individualizado."</td></tr><tr><td>"Não tenho tempo"</td><td>"Meus alunos treinam 3x por semana, 40 min cada."</td></tr></table><h4>Combinados com o closer</h4><ul><li>Lead via DM com palavra-código → WhatsApp em até 2h</li><li>Usar nome do Reel de origem para personalizar</li><li>Meta: 70% DM → WhatsApp | 40% WhatsApp → Call agendada</li></ul>`,
+
+  'f1s3t1': `<p>O SM usa o banco de 30 Reels gravados na Semana 2. Postar 1 por dia seguindo o calendário de docs/04-calendario.md. Distribuição: 50% educativos, 33% autoridade, 17% conversão.</p><div class="note">Todo Reel de topo de funil DEVE ter uma palavra-código no CTA para o bot de DM qualificar.</div>`,
+
+  'f1s3t2': `<h4>Estrutura diária (repete todo dia)</h4><ul><li><strong>Frame 1:</strong> Bastidor do dia (treino, consulta, viagem)</li><li><strong>Frame 2:</strong> Dado ou curiosidade do nicho</li><li><strong>Frame 3:</strong> Pergunta interativa (enquete ou caixa de perguntas)</li><li><strong>Frame 4:</strong> Repost de story de aluno ou resultado</li><li><strong>Frame 5:</strong> CTA direto ("Vagas abertas — link na bio")</li></ul><div class="note">Pede ao designer 5–10 templates fixos no Canva (fundo preto/amarelo). Você só troca o texto.</div>`,
+
+  'f1s3t3': `<p>Todo Reel de topo de funil deve terminar com um CTA pedindo que a pessoa mande uma palavra-código na DM. Exemplos: "comenta TRT", "comenta SHAPE", "manda CARBO no direct".</p><p>Essa palavra-código dispara o bot de DM que qualifica o lead automaticamente.</p>`,
+
+  'f1s3t4': `<h4>Como o bot deve funcionar</h4><p>Quando alguém manda a palavra-código (ex: "TRT"), o bot responde:</p><p><strong>Mensagem 1 (imediata):</strong></p><code>"Oi! Vi que você se interessou. Me conta: você treina regularmente hoje?"</code><ul><li>Se sim → nível 2. Se não → conteúdo educativo e encerra.</li></ul><p><strong>Mensagem 2:</strong></p><code>"Há quanto tempo você treina e não está vendo resultado?"</code><p><strong>Mensagem 3:</strong></p><code>"Você já considerou trabalhar com um consultor ou prefere resolver sozinho por agora?"</code><ul><li>Se considera → direciona pro WhatsApp do closer</li><li>Se prefere sozinho → manda conteúdo e agenda follow-up em 7 dias</li></ul><div class="note">Se você usa ManyChat, passa essa lógica para o técnico implementar. Testa mandando a palavra-código da sua conta pessoal.</div>`,
+
+  'f1s3t5': `<h4>As 8 respostas prontas</h4><ol><li><strong>Quanto custa?</strong> → "R$2.000/ano (R$167/mês). Parcelamento disponível."</li><li><strong>Funciona sem hormônios?</strong> → "Sim. 60% dos alunos são naturais."</li><li><strong>Funciona pra mulher?</strong> → "Sim. 40% da base é feminina."</li><li><strong>Atende fora do Brasil?</strong> → "Sim. Online, 7 países. Horário flexível por fuso."</li><li><strong>Quanto tempo pra resultado?</strong> → "4–8 semanas. Transformação completa em 6 meses."</li><li><strong>É PDF ou tem acompanhamento?</strong> → "Acompanhamento semanal. Não é PDF."</li><li><strong>Precisa de academia?</strong> → "Não. Adaptamos para home gym ou qualquer estrutura."</li><li><strong>Como funciona a garantia?</strong> → "Seguiu o protocolo sem resultado em 90 dias → 100% de volta."</li></ol>`,
+
+  'f1s3t6': `<p>Depois que o VSL for gravado e editado, coloca no topo da landing, logo abaixo do badge "Acompanhamento Premium" e acima do título h1. Vídeo hospedado no YouTube (não listado) ou Vimeo, embed responsivo.</p><div class="note">Aguarda a gravação do VSL (Tarefa: Gravar VSL) antes de implementar.</div>`,
+
+  'f1s4t1': `<h4>Roteiro da semana</h4><ul><li><strong>Segunda:</strong> Stories anunciando — "Semana que vem vou abrir algumas vagas. Fica de olho."</li><li><strong>Terça:</strong> Reel de conversão — "Abri 20 vagas pra consultoria essa semana. Lê isso antes de querer entrar."</li><li><strong>Quarta:</strong> Stories com depoimento de aluno + "Vagas disponíveis"</li><li><strong>Quinta:</strong> Reel de garantia — "Sou o único consultor que devolve seu dinheiro se não tiver resultado."</li><li><strong>Sexta:</strong> Stories de urgência — "Últimas vagas — fecha hoje à meia-noite. Link na bio."</li></ul><h4>Métricas para acompanhar</h4><ul><li>Quantas DMs com palavra-código chegaram</li><li>Quantas foram para o WhatsApp</li><li>Quantas calls agendadas</li><li>Quantas vendas fechadas</li></ul>`,
+
+  'f1s4t2': `<p>Preenche o arquivo docs/06-kpis-semanais.md com os números reais do mês. Compara com as metas e decide o que ajustar para a Fase 2.</p><h4>Perguntas para responder</h4><ul><li>Qual pilar de conteúdo gerou mais engajamento?</li><li>Qual Reel gerou mais DMs qualificadas?</li><li>Qual objeção o closer mais ouviu?</li><li>O CPA do Google caiu?</li></ul>`,
+
+  'f1s4t3': `<p>Com base nos dados da análise de KPIs, reúne com o SM para ajustar o calendário da Fase 2. Dobra a aposta nos formatos e temas que geraram mais DMs e engajamento.</p>`,
+
+  'f1s4t4': `<h4>Título</h4><p>"Os 7 Exames Que Todo Atleta Natural Deveria Fazer — e O Que os Resultados Significam"</p><h4>Conteúdo (8–12 páginas no Canva)</h4><ul><li>Capa: sua foto + logo</li><li><strong>Exame 1:</strong> Testosterona total e livre</li><li><strong>Exame 2:</strong> Estradiol</li><li><strong>Exame 3:</strong> SHBG</li><li><strong>Exame 4:</strong> Prolactina</li><li><strong>Exame 5:</strong> Hemograma completo</li><li><strong>Exame 6:</strong> Perfil lipídico (LDL, HDL, triglicerídeos)</li><li><strong>Exame 7:</strong> IGF-1</li><li>Última página: CTA — "Quer interpretar seus exames? Link para consultoria."</li></ul><h4>Como distribuir</h4><ul><li>Stories com link para formulário (nome + WhatsApp → recebe PDF)</li><li>O número vai para sua lista de leads</li></ul><div class="note">Meta: 200–500 leads na primeira semana de lançamento.</div>`,
+
+  'f2s5t1': `<p>O SM usa o banco de Reels gravados + novos conteúdos reativos para aumentar o volume. Foco em dias de maior engajamento identificados na análise da Semana 4.</p>`,
+
+  'f2s5t2': `<h4>O que procurar</h4><ul><li>Perfis com 20k–200k seguidores</li><li>Nicho complementar (não concorrente): médico esportivo, nutricionista, fisioterapeuta, atleta, influencer fitness</li><li>Engajamento real — verifica pela proporção likes/seguidores</li></ul><h4>Script de DM para abordar</h4><code>"Oi [nome], sigo seu trabalho e acho que nossos públicos se complementam. Topa a gente fazer uma menção cruzada ou um Reel em collab?"</code><h4>Formatos de collab (do mais para menos impactante)</h4><ol><li>Reel em collab — ambos aparecem no mesmo Reel</li><li>Você nos stories dele e ele nos seus</li><li>Menção mútua na legenda</li></ol>`,
+
+  'f2s5t3': `<p>Reel reativo = resposta a trending topic, notícia ou vídeo viral do nicho. Você grava na hora, o SM edita e posta em até 24h enquanto o assunto está quente. Tem muito mais alcance que conteúdo planejado.</p>`,
+
+  'f2s6t1': `<p>Com base no mapeamento da Semana 5, fecha 2 collabs. Prioriza o formato Reel em collab — os dois perfis aprovam e o alcance dobra automaticamente.</p>`,
+
+  'f2s6t2': `<h4>Sequência de stories para lançar o guia</h4><ul><li><strong>Story 1:</strong> "Você sabe quais exames pedir antes de qualquer protocolo?"</li><li><strong>Story 2:</strong> "Criei um guia gratuito com os 7 exames essenciais"</li><li><strong>Story 3:</strong> "É gratuito. Só precisa do seu WhatsApp." + link do formulário</li><li><strong>Story 4:</strong> Depoimento de quem já leu</li><li><strong>Story 5:</strong> "Último dia para pegar" (urgência)</li></ul><div class="note">Meta: 200–500 leads na primeira semana.</div>`,
+
+  'f2s6t3': `<p>Após o lead preencher o formulário e receber o PDF, configura sequência automática no WhatsApp: boas-vindas no dia 1, conteúdo educativo no dia 3, convite para consultoria no dia 7.</p>`,
+
+  'f2s7t1': `<p>Acompanha o crescimento da lista via formulário do lead magnet. Se estiver abaixo de 500 leads na Semana 7, intensifica a divulgação nos stories e considera impulsionar o post do guia.</p>`,
+
+  'f2s7t2': `<p>Cria uma sequência de 3–5 emails (ou mensagens WhatsApp) que vai nutrir os leads da lista ao longo de 7–10 dias. Conteúdo: educativo no dia 1, prova social no dia 3, convite para consultoria no dia 7.</p>`,
+
+  'f2s7t3': `<p>Reel mostrando a comunidade de alunos, resultados coletivos, a energia do grupo. Objetivo: gerar FOMO e desejo de pertencer. CTA: "manda 'TIME' no direct para saber como entrar".</p>`,
+
+  'f2s8t1': `<h4>Tema sugerido</h4><p>"Hormônios, treino e dieta — o que ninguém te conta"</p><h4>Estrutura (90 min)</h4><ul><li><strong>0–10 min:</strong> Apresentação e aquecimento</li><li><strong>10–30 min:</strong> "Os 3 erros hormonais que destroem sua evolução"</li><li><strong>30–50 min:</strong> "Como montar um protocolo que realmente funciona"</li><li><strong>50–70 min:</strong> Perguntas do chat ao vivo</li><li><strong>70–80 min:</strong> Apresentação da consultoria + garantia</li><li><strong>80–90 min:</strong> "Vagas abertas agora pelo link na bio"</li></ul><h4>Promoção</h4><ul><li>Anuncia 7 dias antes em stories</li><li>Anuncia 3 dias antes em Reel</li><li>Anuncia no dia (manhã + 1h antes)</li></ul><h4>Pós-live</h4><p>SM corta em 10 Reels dos melhores momentos (30–60s cada) → conteúdo das próximas 4 semanas.</p>`,
+
+  'f2s8t2': `<p>O SM pega a gravação da live e corta nos melhores momentos — cada trecho de 30–60s vira um Reel independente. Meta: 10 Reels = 10 dias de conteúdo sem nova gravação.</p>`,
+
+  'f2s8t3': `<p>Preenche o arquivo docs/06-kpis-semanais.md com os números do segundo mês. Compara com as metas e decide o que escalar ou ajustar para a Fase 3.</p>`,
+
+  'f3s9t1': `<p>Define o desconto do plano 2 anos (sugestão: 15–20% sobre o anual). Cria escassez real: matrículas só abrem em datas específicas do mês, controlando o volume de novos alunos.</p>`,
+
+  'f3s9t2': `<p>Define a janela mensal de matrícula (ex: toda primeira semana do mês). Comunica nos stories e na bio. Cria lista de espera para o restante do mês.</p>`,
+
+  'f3s10t1': `<h4>Roteiro dos 5 dias</h4><ul><li><strong>Dia 1 — Aquecimento:</strong> Stories: "Semana que vem vou abrir vagas." Reel: caso de transformação mais impactante. Email/WhatsApp para lista: acesso antecipado.</li><li><strong>Dia 2 — Educação:</strong> Live ou Reel longo sobre o problema principal. Autoridade sem vender ainda.</li><li><strong>Dia 3 — Prova social:</strong> Reel com depoimento mais impactante. Stories com 5–6 antes/depois.</li><li><strong>Dia 4 — Abertura:</strong> Reel anunciando vagas. Stories o dia todo com CTA. Live de 30–60 min respondendo perguntas.</li><li><strong>Dia 5 — Fechamento:</strong> Stories de urgência a cada 2h. Reel de última chamada. WhatsApp: "Fecha hoje à meia-noite."</li></ul><div class="note">Meta: 8–15 vendas em 5 dias = R$16–30k</div>`,
+
+  'f3s10t2': `<p>Documenta todo o roteiro do lançamento: sequência de stories, Reels, emails e WhatsApp de cada dia. Serve de template para repetir o lançamento todo mês.</p>`,
+
+  'f3s11t1': `<p>Configura sequência automática de mensagens WhatsApp para os 30 dias seguintes à matrícula de cada aluno: boas-vindas, protocolo inicial, check-in semanal. O técnico implementa via ferramenta de automação.</p>`,
+
+  'f3s11t2': `<p>Reúne com o closer e revisa as objeções específicas de leads vindos do Instagram — diferentes de leads do Google. Atualiza o script da call com as respostas mais eficazes das últimas semanas.</p>`,
+
+  'f3s12t1': `<h4>Preenche esse quadro</h4><table><tr><th>Métrica</th><th>Dia 1</th><th>Dia 30</th><th>Dia 60</th><th>Dia 90</th><th>Meta</th></tr><tr><td>Seguidores</td><td>85.400</td><td></td><td></td><td></td><td>120k</td></tr><tr><td>Vendas Insta/mês</td><td>0</td><td></td><td></td><td></td><td>30–50</td></tr><tr><td>Fat. Insta/mês</td><td>R$0</td><td></td><td></td><td></td><td>R$60–100k</td></tr><tr><td>CPA Google</td><td>R$15,94</td><td></td><td></td><td></td><td>R$13</td></tr><tr><td>Leads na lista</td><td>0</td><td></td><td></td><td></td><td>1.000+</td></tr></table>`,
+
+  'f3s12t2': `<p>Com base na análise dos 90 dias, define os KPIs e a estratégia para o próximo ciclo. O que escalar, o que abandonar, o que testar de novo.</p>`,
+
+  'f3s12t3': `<h4>Decisões para os próximos 90 dias</h4><ul><li>Contratar editor de vídeo dedicado? (libera 2h/dia)</li><li>Aumentar verba de Ads? (se CPA caiu para a meta)</li><li>Contratar segundo closer? (se volume de leads cresceu)</li><li>Criar produto de ticket menor? (curso, mentoria em grupo)</li></ul>`,
+};
+
 // ===== BADGES =====
 function badge(type) {
   const map = { you:'badge-you', tech:'badge-tech', sm:'badge-sm', all:'badge-all' };
@@ -683,6 +808,7 @@ function renderTasks(containerId, tasks) {
   el.innerHTML = '';
   tasks.forEach(t => {
     const checked = isDone(t.id);
+    const instr = INSTRUCTIONS[t.id];
     const div = document.createElement('div');
     div.className = 'task-item' + (checked ? ' done' : '');
     div.dataset.id = t.id;
@@ -691,10 +817,20 @@ function renderTasks(containerId, tasks) {
       <div class="task-body">
         <div class="task-text">${t.text}</div>
         <div class="task-meta">${t.meta}</div>
+        ${instr ? `<div class="task-instr">${instr}</div>` : ''}
       </div>
       ${badge(t.badge)}
+      ${instr ? `<div class="task-expand">▼</div>` : ''}
     `;
-    div.addEventListener('click', () => toggleTask(t.id, div));
+    div.querySelector('.task-check').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleTask(t.id, div);
+    });
+    if (instr) {
+      div.addEventListener('click', (e) => {
+        if (!e.target.closest('.task-check')) div.classList.toggle('expanded');
+      });
+    }
     el.appendChild(div);
   });
 }
