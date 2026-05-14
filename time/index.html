@@ -106,11 +106,11 @@
         linear-gradient(to right, rgba(8,8,8,0.05) 0%, rgba(8,8,8,0.5) 55%, rgba(8,8,8,0.88) 100%);
     }
     @media (max-width: 768px) {
-      .hero::before { background-position: center top; opacity: 0.35; }
+      .hero::before { background-position: center 20%; opacity: 0.10; }
       .hero::after {
-        background:
-          linear-gradient(to bottom, rgba(8,8,8,0.3) 0%, rgba(8,8,8,0.75) 100%);
+        background: linear-gradient(to bottom, rgba(8,8,8,0.65) 0%, rgba(8,8,8,0.90) 50%, rgba(8,8,8,0.98) 100%);
       }
+      .hero { padding: 80px 20px 120px; }
       .hero-stats { gap: 10px; margin-top: 40px; flex-wrap: wrap; }
       .hero-stat { flex: 1 1 calc(50% - 10px); }
       .hero-stat .num { font-size: 1.6rem; }
@@ -654,6 +654,115 @@
     .btn-primary { animation: pulse-yellow 3s ease-in-out infinite; }
     .btn-final { animation: pulse-yellow 3s ease-in-out infinite; }
     .btn-wpp-sm { animation: pulse-yellow 3s ease-in-out infinite; }
+
+    /* ── MOBILE CENTERING FIXES ── */
+    @media (max-width: 768px) {
+      .section-tag { text-align: center; display: block; }
+      .pain-intro, .del-intro, .results-intro { text-align: center; margin-left: auto; margin-right: auto; }
+      .pain .container h2,
+      .method .container h2,
+      .results .container h2,
+      .deliverables .container h2,
+      .faq .container h2 { text-align: center; }
+      .about-text h2, .about-text .section-tag { text-align: center; }
+      .about-text p { text-align: center; }
+      .cred-list li { justify-content: center; }
+      section { padding: 60px 20px; }
+    }
+
+    /* ── PAIN BRIDGE ── */
+    .pain-bridge {
+      margin-top: 32px;
+      padding: 18px 22px;
+      background: rgba(245,197,24,0.04);
+      border: 1px solid rgba(245,197,24,0.12);
+      border-radius: 8px;
+      text-align: center;
+    }
+    .pain-bridge p { color: #aaa; font-size: 0.95rem; margin: 0; line-height: 1.6; }
+    .pain-bridge em { color: var(--yellow); font-style: normal; font-weight: 700; }
+
+    /* ── QUIZ ── */
+    .quiz-section { background: var(--dark); padding: 80px 24px; }
+    @media (max-width: 768px) { .quiz-section { padding: 60px 20px; } }
+
+    .quiz-intro-wrap { max-width: 600px; margin: 0 auto; text-align: center; }
+    .quiz-intro-wrap h2 { text-align: center; }
+    .quiz-sub { color: #bbb; font-size: 1rem; margin: 0 auto 32px; max-width: 460px; line-height: 1.65; }
+    .btn-quiz-start {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--yellow); color: #000;
+      font-weight: 900; font-size: 16px;
+      padding: 17px 34px; border-radius: 8px;
+      border: none; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 4px 24px rgba(245,197,24,0.35);
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-quiz-start:hover { background: var(--yellow-dark); transform: translateY(-2px); }
+    .quiz-note { margin-top: 14px; font-size: 12px; color: #555; }
+
+    .quiz-body { max-width: 560px; margin: 0 auto; }
+    .quiz-progress { height: 3px; background: #1e1e1e; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
+    .quiz-progress-bar { height: 100%; background: var(--yellow); border-radius: 2px; transition: width 0.45s ease; }
+    .quiz-step-label { font-size: 11px; color: #555; text-align: center; margin-bottom: 28px; letter-spacing: 1.5px; text-transform: uppercase; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .quiz-question-wrap { animation: fadeInUp 0.35s ease both; }
+    .quiz-question-emoji { font-size: 2.2rem; display: block; text-align: center; margin-bottom: 14px; }
+    .quiz-question-text {
+      font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 800;
+      color: #fff; text-align: center; line-height: 1.35; margin-bottom: 26px;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-option {
+      display: flex; align-items: center; gap: 13px;
+      background: var(--dark3); border: 1.5px solid #2a2a2a;
+      border-radius: 10px; padding: 15px 20px;
+      font-size: 0.95rem; color: #ccc; font-weight: 500;
+      cursor: pointer; text-align: left;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.18s, background 0.18s, color 0.18s;
+    }
+    .quiz-option:hover { border-color: rgba(245,197,24,0.5); color: #fff; background: #242424; }
+    .quiz-option.selected { border-color: var(--yellow); background: rgba(245,197,24,0.07); color: #fff; }
+    .quiz-opt-dot {
+      width: 16px; height: 16px; flex-shrink: 0;
+      border: 1.5px solid #3a3a3a; border-radius: 50%;
+      transition: border-color 0.18s, background 0.18s;
+    }
+    .quiz-option.selected .quiz-opt-dot { border-color: var(--yellow); background: var(--yellow); }
+
+    .quiz-result-outer { max-width: 540px; margin: 0 auto; text-align: center; animation: fadeInUp 0.4s ease both; }
+    .quiz-result-badge {
+      display: inline-block;
+      background: rgba(245,197,24,0.10); border: 1px solid rgba(245,197,24,0.25);
+      color: var(--yellow); font-size: 10px; font-weight: 800;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 3px; margin-bottom: 14px;
+    }
+    .quiz-result-title { font-size: clamp(1.4rem, 4vw, 1.9rem); font-weight: 900; color: #fff; margin-bottom: 18px; }
+    .quiz-result-desc { color: #bbb; font-size: 0.95rem; line-height: 1.75; max-width: 460px; margin: 0 auto 20px; }
+    .quiz-result-card {
+      background: var(--dark3); border: 1px solid #2a2a2a;
+      border-left: 3px solid var(--yellow); border-radius: 8px;
+      padding: 16px 20px; text-align: left; margin: 0 auto 28px; max-width: 460px;
+    }
+    .quiz-result-card strong { color: var(--yellow); font-size: 0.76rem; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    .quiz-result-card p { font-size: 0.88rem; color: #aaa; margin: 0; line-height: 1.7; }
+    .btn-quiz-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--yellow); color: #000; font-weight: 900; font-size: 15px;
+      padding: 17px 34px; border-radius: 8px; text-decoration: none;
+      box-shadow: 0 4px 24px rgba(245,197,24,0.35);
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-quiz-cta:hover { background: var(--yellow-dark); transform: translateY(-2px); }
+    .quiz-restart-link { display: block; margin-top: 16px; font-size: 12px; color: #3a3a3a; cursor: pointer; transition: color 0.2s; }
+    .quiz-restart-link:hover { color: #666; }
   </style>
 </head>
 <body>
@@ -732,6 +841,36 @@
       <li><span class="icon">❌</span> Já tentou de tudo mas os resultados não aparecem ou não duram</li>
       <li><span class="icon">❌</span> Se sente perdido sem saber qual caminho realmente funciona pro seu biotipo</li>
     </ul>
+    <div class="pain-bridge">
+      <p>Esses obstáculos têm solução — mas ela precisa ser construída pro <em>seu</em> caso específico, não pra todo mundo igual.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="quiz-section">
+  <div class="container">
+
+    <div class="quiz-intro-wrap" id="quizIntro">
+      <p class="section-tag">Diagnóstico gratuito</p>
+      <h2>Por que o <span style="color:var(--yellow)">seu</span> corpo ainda não mudou?</h2>
+      <p class="quiz-sub">Cada corpo trava por um motivo diferente. Em 5 perguntas você descobre exatamente qual é o seu — e o que precisa mudar.</p>
+      <button class="btn-quiz-start" onclick="startQuiz()">Descobrir meu diagnóstico →</button>
+      <p class="quiz-note">Sem cadastro &middot; 60 segundos &middot; Resultado imediato</p>
+    </div>
+
+    <div class="quiz-body" id="quizBody" style="display:none">
+      <div class="quiz-progress">
+        <div class="quiz-progress-bar" id="quizProgressBar" style="width:0%"></div>
+      </div>
+      <p class="quiz-step-label" id="quizStepLabel"></p>
+      <div class="quiz-question-wrap" id="quizQuestionWrap"></div>
+    </div>
+
+    <div id="quizResult" style="display:none">
+      <div class="quiz-result-outer" id="quizResultInner"></div>
+    </div>
+
   </div>
 </section>
 
@@ -1112,6 +1251,149 @@
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeReviews();
   });
+
+  // ── QUIZ ──
+  var QUIZ_Q = [
+    {
+      emoji: '🪞',
+      text: 'Quando você pensa no seu corpo hoje, o que mais te incomoda?',
+      opts: [
+        { l: 'Me esforcei muito e quase nada mudou', v: 'effort' },
+        { l: 'Começo, paro, recomeço… e estou cansado disso', v: 'cycle' },
+        { l: 'Nunca tive orientação de verdade — estou perdido', v: 'lost' },
+        { l: 'Já tive resultado antes, mas voltou tudo', v: 'regain' }
+      ]
+    },
+    {
+      emoji: '⏳',
+      text: 'E isso está acontecendo faz quanto tempo?',
+      opts: [
+        { l: 'Menos de 6 meses', v: 'short' },
+        { l: 'Entre 1 e 3 anos', v: 'mid' },
+        { l: 'Mais de 3 anos', v: 'long' },
+        { l: 'A vida inteira — nunca consegui manter', v: 'always' }
+      ]
+    },
+    {
+      emoji: '🚧',
+      text: 'O que mais sabota quando você tenta mudar?',
+      opts: [
+        { l: 'A dieta — impossível de seguir na prática', v: 'diet' },
+        { l: 'Começo com tudo, mas perco o ritmo rápido', v: 'rhythm' },
+        { l: 'Treino muito e não vejo resultado', v: 'training' },
+        { l: 'Ansiedade, compulsão ou estresse sabotam tudo', v: 'mental' }
+      ]
+    },
+    {
+      emoji: '🎯',
+      text: 'Se esse obstáculo sumisse, qual seria seu objetivo principal?',
+      opts: [
+        { l: 'Emagrecer e tirar esse peso de vez', v: 'lose' },
+        { l: 'Ganhar músculo e ficar definido', v: 'gain' },
+        { l: 'Emagrecer e ganhar massa ao mesmo tempo', v: 'recomp' },
+        { l: 'Saúde — me sentir bem no meu próprio corpo', v: 'health' }
+      ]
+    },
+    {
+      emoji: '✨',
+      text: 'E chegando lá de verdade — o que mudaria na sua vida?',
+      opts: [
+        { l: 'Minha autoestima e confiança voltariam', v: 'confidence' },
+        { l: 'Teria mais energia e disposição no dia a dia', v: 'energy' },
+        { l: 'Me sentiria bem me olhando no espelho', v: 'mirror' },
+        { l: 'Pararia de adiar e viveria de verdade', v: 'life' }
+      ]
+    }
+  ];
+
+  var QUIZ_PROFILES = {
+    effort: {
+      title: 'O Esforçado Sem Método',
+      desc: 'Você faz a parte que depende de você — o problema é que está seguindo um protocolo que não foi feito para o seu corpo. Esforço sem método certo é energia desperdiçada. A culpa não é sua: é da abordagem.',
+      need: 'Um diagnóstico real — biotipo, histórico, exames — e um protocolo que trabalhe com a sua biologia, não contra ela.'
+    },
+    cycle: {
+      title: 'O Recomeçante Esgotado',
+      desc: 'Você já provou que tem força de vontade — senão não teria recomeçado tantas vezes. O que falta não é motivação: é um sistema que não te deixe cair. Recomeçar sozinho tem prazo de validade.',
+      need: 'Acompanhamento que detecta e corrige desvios antes que você desista. Alguém que não te abandona no processo.'
+    },
+    lost: {
+      title: 'O Confuso Sem Bússola',
+      desc: 'Com tanta informação por aí, é normal estar perdido. Mas informação genérica não funciona para corpos específicos. Você não é o problema — o problema é tentar resolver com conteúdo feito para outro perfil.',
+      need: 'Um ponto de partida personalizado — sem mais tentativa e erro com métodos que funcionaram para outra pessoa.'
+    },
+    regain: {
+      title: 'O Maratonista em Círculos',
+      desc: 'Você já sabe que é possível — porque já chegou lá antes. O problema é que o método anterior não te preparou para manter. Resultado temporário não é resultado.',
+      need: 'Um protocolo que constrói o resultado E ensina o corpo a sustentá-lo. Não uma dieta com prazo — um estilo de vida viável.'
+    }
+  };
+
+  var quizAnswers = [];
+
+  function startQuiz() {
+    document.getElementById('quizIntro').style.display = 'none';
+    document.getElementById('quizBody').style.display = 'block';
+    renderQ(0);
+  }
+
+  function renderQ(idx) {
+    var total = QUIZ_Q.length;
+    document.getElementById('quizProgressBar').style.width = Math.round((idx / total) * 100) + '%';
+    document.getElementById('quizStepLabel').textContent = 'Pergunta ' + (idx + 1) + ' de ' + total;
+    var q = QUIZ_Q[idx];
+    var wrap = document.getElementById('quizQuestionWrap');
+    wrap.style.animation = 'none';
+    wrap.offsetHeight;
+    wrap.style.animation = 'fadeInUp 0.35s ease both';
+    var wppSvg = '<svg style="width:18px;height:18px;fill:#000;flex-shrink:0" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+    wrap.innerHTML =
+      '<span class="quiz-question-emoji">' + q.emoji + '</span>' +
+      '<p class="quiz-question-text">' + q.text + '</p>' +
+      '<div class="quiz-options">' +
+      q.opts.map(function(o, i) {
+        return '<button class="quiz-option" onclick="pickOpt(' + idx + ',\'' + o.v + '\',this)">' +
+               '<span class="quiz-opt-dot"></span>' + o.l + '</button>';
+      }).join('') +
+      '</div>';
+  }
+
+  function pickOpt(idx, val, el) {
+    document.querySelectorAll('.quiz-option').forEach(function(b) { b.classList.remove('selected'); });
+    el.classList.add('selected');
+    quizAnswers[idx] = val;
+    setTimeout(function() {
+      if (idx + 1 < QUIZ_Q.length) {
+        renderQ(idx + 1);
+      } else {
+        showQuizResult();
+      }
+    }, 420);
+  }
+
+  function showQuizResult() {
+    document.getElementById('quizBody').style.display = 'none';
+    document.getElementById('quizResult').style.display = 'block';
+    var profile = QUIZ_PROFILES[quizAnswers[0]] || QUIZ_PROFILES.effort;
+    var msg = encodeURIComponent('Oi Fabricio! Fiz o diagnóstico no site e quero entender como você pode me ajudar.');
+    var wppSvg = '<svg style="width:18px;height:18px;fill:#000;flex-shrink:0" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
+    document.getElementById('quizResultInner').innerHTML =
+      '<span class="quiz-result-badge">Seu diagnóstico</span>' +
+      '<h2 class="quiz-result-title">' + profile.title + '</h2>' +
+      '<p class="quiz-result-desc">' + profile.desc + '</p>' +
+      '<div class="quiz-result-card"><strong>O que você precisa</strong><p>' + profile.need + '</p></div>' +
+      '<a href="https://wa.me/+5511914849797?text=' + msg + '" class="btn-quiz-cta" target="_blank" rel="noopener noreferrer">' +
+      wppSvg + 'Falar com Fabricio sobre meu caso</a>' +
+      '<span class="quiz-restart-link" onclick="resetQuiz()">Refazer o diagnóstico</span>';
+  }
+
+  function resetQuiz() {
+    quizAnswers = [];
+    document.getElementById('quizResult').style.display = 'none';
+    document.getElementById('quizBody').style.display = 'none';
+    document.getElementById('quizProgressBar').style.width = '0%';
+    document.getElementById('quizIntro').style.display = 'block';
+  }
 </script>
 
 </body>
