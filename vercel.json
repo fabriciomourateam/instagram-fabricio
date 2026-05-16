@@ -1,9 +1,10 @@
 {
-  "rewrites": [
+  "redirects": [
     {
       "source": "/",
       "destination": "/acompanhamento-premium",
-      "has": [{ "type": "host", "value": "time.fabriciomoura.com" }]
+      "has": [{ "type": "host", "value": "time.fabriciomoura.com" }],
+      "permanent": false
     }
   ]
 }
