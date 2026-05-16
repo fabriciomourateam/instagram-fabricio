@@ -1,5 +1,9 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/time" }
+    {
+      "source": "/",
+      "destination": "/time",
+      "has": [{ "type": "host", "value": "premium.fabriciomoura.com" }]
+    }
   ]
 }
