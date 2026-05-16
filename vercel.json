@@ -2,8 +2,8 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/time",
-      "has": [{ "type": "host", "value": "premium.fabriciomoura.com" }]
+      "destination": "/acompanhamento-premium",
+      "has": [{ "type": "host", "value": "time.fabriciomoura.com" }]
     }
   ]
 }
