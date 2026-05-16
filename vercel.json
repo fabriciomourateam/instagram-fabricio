@@ -1,13 +1,9 @@
 {
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "destination": "https://premium.fabriciomoura.com/$1",
-      "has": [{ "type": "host", "value": "instagram-fabricio.vercel.app" }],
-      "permanent": false
-    }
-  ],
   "rewrites": [
-    { "source": "/", "destination": "/time" }
+    {
+      "source": "/",
+      "destination": "/time",
+      "has": [{ "type": "host", "value": "premium.fabriciomoura.com" }]
+    }
   ]
 }
